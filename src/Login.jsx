@@ -61,6 +61,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     try {
       const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
@@ -80,12 +81,12 @@ const Login = () => {
           navigate('/home');
         }
       } else {
-        alert(data.message);
+        alert(data.message || "Invalid credentials");
       }
+
     } catch (error) {
-  console.error("Login error:", error);
-  alert("Login failed. Please check your email or password.");
-}
+      console.error("Login error:", error);
+      alert("Login failed. Please check your email or password.");
     }
   };
 
@@ -94,11 +95,11 @@ const Login = () => {
       <div style={cardStyle}>
         <h2 style={{ fontSize: '2.5rem', marginBottom: '8px', color: '#1a4d1a' }}>Login</h2>
         <p style={{ marginBottom: '35px', color: '#666', fontSize: '0.95rem' }}>
-            Enter your credentials to manage your sustainable kitchen.
+          Enter your credentials to manage your sustainable kitchen.
         </p>
-        
+
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <input 
+          <input
             type="email"
             placeholder="Email Address"
             value={email}
@@ -106,6 +107,7 @@ const Login = () => {
             style={inputStyle}
             required
           />
+
           <input
             type="password"
             placeholder="Password"
@@ -114,6 +116,7 @@ const Login = () => {
             style={inputStyle}
             required
           />
+
           <button type="submit" style={buttonStyle}>
             LOGIN
           </button>
