@@ -83,8 +83,9 @@ const Login = () => {
         alert(data.message);
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Server error. Ensure backend is running!");
+  console.error("Login error:", error);
+  alert("Login failed. Please check your email or password.");
+}
     }
   };
 
