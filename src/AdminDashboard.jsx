@@ -16,11 +16,11 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const uRes = await fetch('http://127.0.0.1:5000/admin/users');
+      const uRes = await fetch(`${API_BASE_URL}/admin/users`);
       const uData = await uRes.json();
       setUsers(uData);
 
-      const wRes = await fetch('http://127.0.0.1:5000/admin/waste-reports');
+      const wRes = await fetch(`${API_BASE_URL}/admin/waste-reports`);
       const wData = await wRes.json();
       setWasteData(wData);
     } catch (err) {
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   const deleteUser = async (email) => {
     if (window.confirm(`Are you sure you want to delete ${email}?`)) {
       try {
-        const res = await fetch(`http://127.0.0.1:5000/admin/delete-user/${email}`, { method: 'DELETE' });
+        const res = await fetch(`${API_BASE_URL}/admin/delete-user/${email}`, { method: 'DELETE' });
         if (res.ok) {
           alert("User deleted successfully");
           fetchData();
@@ -42,19 +42,17 @@ const AdminDashboard = () => {
     }
   };
 
-  // --- UPDATED: Generate Excel Report instead of JSON ---
   const downloadReport = async (email) => {
   try {
-    const res = await fetch(`http://127.0.0.1:5000/admin/generate-report/${email}`);
+    const res = await fetch(`${API_BASE_URL}/admin/generate-report/${email}`);
     
     if (!res.ok) {
         throw new Error(`Server responded with status: ${res.status}`);
     }
 
     const rawData = await res.json();
-    console.log("Verified Raw Data:", rawData); // Check your F12 console for this!
+    console.log("Verified Raw Data:", rawData);
 
-    // Ensure we are working with an array. If backend sends a single object, wrap it.
     const dataArray = Array.isArray(rawData) ? rawData : (rawData ? [rawData] : []);
 
     if (dataArray.length === 0) {
@@ -62,7 +60,6 @@ const AdminDashboard = () => {
       return;
     }
 
-    // MANUALLY mapping to ensure headers ARE created
     const rows = dataArray.map(item => {
       return {
         "User Email": email,
@@ -73,16 +70,13 @@ const AdminDashboard = () => {
       };
     });
 
-    // Create Worksheet
     const worksheet = XLSX.utils.json_to_sheet(rows);
     
-    // Force set column widths so it's not "empty-looking"
     worksheet['!cols'] = [{ wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 10 }, { wch: 15 }];
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Waste Report");
 
-    // File Download
     XLSX.writeFile(workbook, `Report_${email.split('@')[0]}.xlsx`);
 
   } catch (err) {
@@ -93,7 +87,7 @@ const AdminDashboard = () => {
 
   const postRecipe = async (e) => {
     e.preventDefault();
-    const res = await fetch('http://127.0.0.1:5000/admin/post-recipe', {
+    const res = await fetch(`${API_BASE_URL}/admin/post-recipe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newRecipe)
@@ -168,23 +162,3 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
-// ... (Your styles remain exactly the same as you provided) ...
-const adminContainer = { display: 'flex', minHeight: '100vh', backgroundColor: '#031a10', color: 'white', fontFamily: 'Poppins' };
-const sidebarStyle = { width: '300px', backgroundColor: '#052a1a', padding: '40px', borderRight: '1px solid rgba(255,255,255,0.1)' };
-const menuStyle = { display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '50px' };
-const tabBtn = { background: 'none', border: 'none', color: '#aaa', textAlign: 'left', fontSize: '18px', cursor: 'pointer', padding: '10px' };
-const activeBtn = { ...tabBtn, color: '#ffcc33', fontWeight: 'bold', borderLeft: '4px solid #ffcc33', paddingLeft: '15px' };
-const mainContentStyle = { flex: 1, padding: '60px' };
-const contentCard = { padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px' };
-const titleStyle = { fontSize: '40px', color: '#99ff66', marginBottom: '30px' };
-const tableStyle = { width: '100%', borderCollapse: 'collapse', fontSize: '18px', textAlign: 'left' };
-const reportBtn = { backgroundColor: '#2d7a2d', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '8px', marginRight: '10px', cursor: 'pointer', fontWeight: 'bold', transition: '0.3s' };
-const deleteBtn = { backgroundColor: '#ff4d4d', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.3s' };
-const inputS = { padding: '15px', borderRadius: '10px', border: '1px solid #333', background: '#083320', color: 'white', marginBottom: '15px', fontSize: '16px' };
-const submitBtn = { padding: '18px', backgroundColor: '#99ff66', color: '#000', fontWeight: 'bold', border: 'none', borderRadius: '10px', cursor: 'pointer', fontSize: '18px' };
-const backBtn = { marginTop: '100px', color: '#aaa', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: '16px' };
-const reportRow = { display: 'flex', justifyContent: 'space-between', padding: '20px 0', borderBottom: '1px solid #222', fontSize: '18px' };
-const formStyle = { display: 'flex', flexDirection: 'column' };
-
-export default AdminDashboard;

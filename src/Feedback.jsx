@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import API_BASE_URL from './config';
 
 const Feedback = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Feedback = () => {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/feedback', {
+      const response = await fetch(`${API_BASE_URL}/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(feedbackData)
@@ -84,7 +85,7 @@ const Feedback = () => {
   );
 };
 
-// --- STYLES (Matching your Home & Profile theme) ---
+// styles unchanged
 const pageStyle = { 
   backgroundColor: '#052a1a', 
   minHeight: '100vh', 
