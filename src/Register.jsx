@@ -51,7 +51,7 @@ const Register = () => {
 
   const buttonStyle = {
     padding: '15px',
-    backgroundColor: '#1a4d1a', // Matching your brand green
+    backgroundColor: '#1a4d1a',
     color: 'white',
     border: 'none',
     borderRadius: '15px',
@@ -65,7 +65,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://127.0.0.1:5000/register', {
+      const response = await fetch('https://sustaineats-backend.onrender.com/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
@@ -75,7 +75,7 @@ const Register = () => {
       
       if (response.ok) {
         alert("Registration Successful!");
-        navigate('/'); // Redirect to Login
+        navigate('/');
       } else {
         alert(data.message);
       }
