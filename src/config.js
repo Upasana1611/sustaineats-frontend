@@ -1,3 +1,2 @@
-const API_URL = "https://sustaineats-backend.onrender.com";
-
-export default API_URL;
+const API_BASE_URL = "https://sustaineats-backend.onrender.com";
+export default API_BASE_URL;
