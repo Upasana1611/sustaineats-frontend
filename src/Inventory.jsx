@@ -4,6 +4,7 @@ import bgTable from './assets/background-table.png'; // Background asset
 import salmonImg from './assets/salmon.png';
 import olivesImg from './assets/olives.png';
 import tomatoesImg from './assets/tomatoes.png';
+import API_BASE_URL from './config';
 
 const Inventory = () => {
   const [items, setItems] = useState([]);
@@ -16,7 +17,7 @@ const Inventory = () => {
   const fetchInventory = async () => {
     if (!userEmail) return;
     try {
-      const res = await fetch(`http://127.0.0.1:5000/inventory/${userEmail}`);
+      const res = await fetch(`${API_BASE_URL}/inventory/${userEmail}`);
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
     } catch (err) { console.error("Fetch error:", err); }
@@ -25,7 +26,7 @@ const Inventory = () => {
   const getRecipeSuggestions = async () => {
     if (!userEmail) return;
     try {
-      const res = await fetch(`http://127.0.0.1:5000/suggest-recipes/${userEmail}`);
+      const res = await fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`);
       const data = await res.json();
       setSuggestions(data);
     } catch (err) {
@@ -39,7 +40,7 @@ const Inventory = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://127.0.0.1:5000/inventory', {
+      const res = await fetch(`${API_BASE_URL}/inventory`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...newItem, email: userEmail })
@@ -50,7 +51,7 @@ const Inventory = () => {
 
   const handleDelete = async (itemName) => {
     try {
-        const res = await fetch('http://127.0.0.1:5000/inventory/delete', {
+        const res = await fetch(`${API_BASE_URL}/inventory/delete`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: itemName, email: userEmail })
