@@ -1,0 +1,12 @@
+/* Removes the default gap around the edges */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: white;
+}
+
+/* Ensures the root app container fills the screen */
+#root {
+  min-height: 100vh;
+  width: 100%;
+}

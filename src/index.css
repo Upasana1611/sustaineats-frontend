@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Poppins:wght@300;400;600;800&display=swap');
+
+/* 1. GLOBAL SCALING */
+:root {
+  /* This scales the entire app up */
+  font-size: 20px; 
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  background-color: #052a1a; /* Your SustainEats Dark Green */
+  color: white;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* 2. LOGO & BRANDING (Updated font sizes) */
+.brand-logo-text {
+  font-size: 2rem; /* 40px approx */
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #99ff66;
+  text-transform: uppercase;
+  filter: drop-shadow(0 0 10px rgba(153, 255, 102, 0.3));
+}
+
+.sustainability-leaf {
+  font-size: 2.2rem;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(153, 255, 102, 0.5));
+}
+
+/* 3. PREMIUM GLASSMORPHISM (Dark Mode version for SustainEats) */
+.premium-card {
+  background: rgba(255, 255, 255, 0.05); /* Transparent white */
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 2rem;
+}
+
+.premium-card:hover {
+  transform: translateY(-12px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(153, 255, 102, 0.3); /* Green border on hover */
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+}
+
+/* 4. LARGE ACTION BUTTONS */
+.btn-primary {
+  background: #ffcc33; /* SustainEats Yellow */
+  color: #052a1a;
+  border: none;
+  padding: 1.1rem 2.2rem;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(255, 204, 51, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+  transform: scale(1.08);
+  box-shadow: 0 15px 35px rgba(255, 204, 51, 0.4);
+  background: #ffd65c;
+}
+
+/* 5. HERO SECTION TYPOGRAPHY */
+h1.hero-main-header {
+  font-size: 5.5rem; /* Massive header */
+  font-weight: 800;
+  line-height: 0.9;
+  margin: 20px 0;
+  letter-spacing: -2px;
+}
+
+.hero-description {
+  font-size: 1.3rem; /* 26px approx */
+  color: #ccc;
+  max-width: 700px;
+  margin-bottom: 2.5rem;
+}
+
+/* 6. FEATURED MEAL DESCRIPTION */
+.featured-meal-description {
+  margin-top: 30px;
+  display: flex;
+  align-items: flex-start;
+  max-width: 450px;
+}
+
+.highlight-bullet {
+  color: #ffcc33;
+  font-size: 1.8rem;
+  margin-right: 15px;
+  line-height: 1;
+}
+
+.meal-name {
+  display: block;
+  color: #99ff66;
+  font-weight: 800;
+  font-size: 1.4rem;
+  margin-top: 8px;
+  text-shadow: 0 0 10px rgba(153, 255, 102, 0.2);
+}
+
+/* 7. ANIMATIONS */
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
