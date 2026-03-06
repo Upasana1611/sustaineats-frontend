@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx'; // Import Excel library
 import API_BASE_URL from './config';
 
-const AdminDashboard = () => {
+// Changed from "const AdminDashboard = () => {" to "export default function AdminDashboard() {"
+export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [wasteData, setWasteData] = useState([]);
@@ -43,47 +44,47 @@ const AdminDashboard = () => {
   };
 
   const downloadReport = async (email) => {
-  try {
-    const res = await fetch(`${API_BASE_URL}/admin/generate-report/${email}`);
-    
-    if (!res.ok) {
-        throw new Error(`Server responded with status: ${res.status}`);
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/generate-report/${email}`);
+      
+      if (!res.ok) {
+          throw new Error(`Server responded with status: ${res.status}`);
+      }
+
+      const rawData = await res.json();
+      console.log("Verified Raw Data:", rawData);
+
+      const dataArray = Array.isArray(rawData) ? rawData : (rawData ? [rawData] : []);
+
+      if (dataArray.length === 0) {
+        alert(`The database has no records for ${email}. Record some waste in the app first!`);
+        return;
+      }
+
+      const rows = dataArray.map(item => {
+        return {
+          "User Email": email,
+          "Waste Item": item.item_name || item.name || "Not Specified",
+          "Date": item.waste_date || item.date || "N/A",
+          "Eco Score": item.eco_score || item.score || 0,
+          "Status": "Verified"
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      
+      worksheet['!cols'] = [{ wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 10 }, { wch: 15 }];
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Waste Report");
+
+      XLSX.writeFile(workbook, `Report_${email.split('@')[0]}.xlsx`);
+
+    } catch (err) {
+      console.error("Critical Excel Error:", err);
+      alert("Failed to generate report. Check if the backend server is running.");
     }
-
-    const rawData = await res.json();
-    console.log("Verified Raw Data:", rawData);
-
-    const dataArray = Array.isArray(rawData) ? rawData : (rawData ? [rawData] : []);
-
-    if (dataArray.length === 0) {
-      alert(`The database has no records for ${email}. Record some waste in the app first!`);
-      return;
-    }
-
-    const rows = dataArray.map(item => {
-      return {
-        "User Email": email,
-        "Waste Item": item.item_name || item.name || "Not Specified",
-        "Date": item.waste_date || item.date || "N/A",
-        "Eco Score": item.eco_score || item.score || 0,
-        "Status": "Verified"
-      };
-    });
-
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    
-    worksheet['!cols'] = [{ wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 10 }, { wch: 15 }];
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Waste Report");
-
-    XLSX.writeFile(workbook, `Report_${email.split('@')[0]}.xlsx`);
-
-  } catch (err) {
-    console.error("Critical Excel Error:", err);
-    alert("Failed to generate report. Check if the backend server is running.");
-  }
-};
+  };
 
   const postRecipe = async (e) => {
     e.preventDefault();
@@ -94,6 +95,24 @@ const AdminDashboard = () => {
     });
     if (res.ok) alert("Global Recipe Posted Successfully!");
   };
+
+  // Styles kept exactly as they were
+  const adminContainer = { display: 'flex', minHeight: '100vh', backgroundColor: '#000', color: '#fff' };
+  const sidebarStyle = { width: '250px', backgroundColor: '#111', padding: '20px', borderRight: '1px solid #333' };
+  const menuStyle = { display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '30px' };
+  const tabBtn = { padding: '10px', backgroundColor: 'transparent', color: '#fff', border: 'none', textAlign: 'left', cursor: 'pointer' };
+  const activeBtn = { ...tabBtn, backgroundColor: '#333', borderRadius: '5px', color: '#99ff66' };
+  const backBtn = { marginTop: 'auto', padding: '10px', backgroundColor: '#444', color: '#fff', border: 'none', cursor: 'pointer' };
+  const mainContentStyle = { flex: 1, padding: '40px' };
+  const contentCard = { backgroundColor: '#111', padding: '30px', borderRadius: '15px', border: '1px solid #222' };
+  const titleStyle = { fontSize: '32px', marginBottom: '20px' };
+  const tableStyle = { width: '100%', borderCollapse: 'collapse' };
+  const reportBtn = { marginRight: '10px', padding: '8px 12px', backgroundColor: '#222', border: '1px solid #99ff66', color: '#99ff66', cursor: 'pointer' };
+  const deleteBtn = { padding: '8px 12px', backgroundColor: '#222', border: '1px solid #ff6666', color: '#ff6666', cursor: 'pointer' };
+  const reportRow = { display: 'flex', justifyContent: 'space-between', padding: '15px', borderBottom: '1px solid #222' };
+  const formStyle = { display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '400px' };
+  const inputS = { padding: '12px', borderRadius: '5px', border: '1px solid #333', backgroundColor: '#222', color: '#fff' };
+  const submitBtn = { padding: '15px', backgroundColor: '#99ff66', color: '#000', fontWeight: 'bold', border: 'none', cursor: 'pointer' };
 
   return (
     <div style={adminContainer}>
@@ -114,8 +133,8 @@ const AdminDashboard = () => {
             <table style={tableStyle}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #333' }}>
-                  <th style={{ paddingBottom: '15px' }}>Email</th>
-                  <th style={{ paddingBottom: '15px' }}>Actions</th>
+                  <th style={{ paddingBottom: '15px', textAlign: 'left' }}>Email</th>
+                  <th style={{ paddingBottom: '15px', textAlign: 'left' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,5 +180,4 @@ const AdminDashboard = () => {
       </main>
     </div>
   );
-};
-export default AdminDashboard;
+}
