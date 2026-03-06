@@ -14,14 +14,13 @@ const Home = () => {
   const userEmail = localStorage.getItem("userEmail");
 
   useEffect(() => {
-    if (userEmail) {
-      fetch(`http://127.0.0.1:5000/suggest-recipes/${userEmail}`)
-        .then((res) => res.json())
-        .then((data) => setRecipes(data.slice(0, 3))) 
-        .catch((err) => console.error("Error fetching recipes:", err));
-    }
-  }, [userEmail]);
-
+  if (userEmail) {
+    fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`)
+      .then((res) => res.json())
+      .then((data) => setRecipes(data.slice(0, 3)))
+      .catch((err) => console.error("Error fetching recipes:", err));
+  }
+}, [userEmail]);
   const handleLogout = () => {
     localStorage.clear();
     navigate('/');
