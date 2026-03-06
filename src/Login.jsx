@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API_BASE_URL from './config';
-// CRUCIAL: Import the background image to resolve the path correctly
 import backgroundTable from './assets/background-table.png';
 
 const Login = () => {
@@ -9,12 +8,10 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  // --- STYLES ---
   const containerStyle = {
     position: 'relative',
     minHeight: '100vh',
     width: '100%',
-    // Using the imported asset ensures Vite/React finds the image
     backgroundImage: `url(${backgroundTable})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
@@ -26,14 +23,13 @@ const Login = () => {
   };
 
   const cardStyle = {
-    // Semi-transparent white to show the wooden table behind it
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-    backdropFilter: 'blur(12px)', // High-end frosted glass effect
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backdropFilter: 'blur(12px)',
     padding: '50px',
     borderRadius: '40px',
     width: '400px',
     zIndex: 10,
-    color: '#1a4d1a', 
+    color: '#1a4d1a',
     boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
     textAlign: 'center',
     border: '1px solid rgba(255, 255, 255, 0.4)',
@@ -52,7 +48,7 @@ const Login = () => {
 
   const buttonStyle = {
     padding: '15px',
-    backgroundColor: '#1a4d1a', // Forest Green brand color
+    backgroundColor: '#1a4d1a',
     color: 'white',
     border: 'none',
     borderRadius: '15px',
@@ -66,14 +62,14 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userName", data.name || "User");
@@ -88,7 +84,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Server error. Ensure app.py is running!");
+      alert("Server error. Ensure backend is running!");
     }
   };
 
@@ -102,25 +98,22 @@ const Login = () => {
         
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <input 
-            type="email" 
-            placeholder="Email Address" 
-            value={email} 
+            type="email"
+            placeholder="Email Address"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={inputStyle} 
+            style={inputStyle}
             required
           />
-          <input 
-            type="password" 
-            placeholder="Password" 
-            value={password} 
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={inputStyle} 
+            style={inputStyle}
             required
           />
-          <button 
-            type="submit" 
-            style={buttonStyle}
-          >
+          <button type="submit" style={buttonStyle}>
             LOGIN
           </button>
         </form>
