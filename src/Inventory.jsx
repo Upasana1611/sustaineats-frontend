@@ -126,10 +126,10 @@ const Inventory = () => {
             {suggestions.map((rec, i) => (
               <div key={i} style={recipeCard}>
                 <h4 style={{ color: '#2d7a2d', margin: '0 0 10px 0' }}>{rec.recipe_name}</h4>
-                <p style={{ fontSize: '0.85rem', color: '#444' }}>🌍 Eco-Score: <b>{rec.sustainability_score}/10</b></p>
-                <p style={{ fontSize: '0.85rem', color: '#2d7a2d' }}>✅ Have: {rec.matched_ingredients.join(', ')}</p>
-                {rec.missing_ingredients.length > 0 && (
-                  <p style={{ fontSize: '0.85rem', color: '#d9534f' }}>🛒 Need: {rec.missing_ingredients.join(', ')}</p>
+                <p style={{ fontSize: '0.85rem', color: '#444' }}>🌍 Eco-Score: <b>{rec.sustainability_score || 8}/10</b></p>
+                <p style={{ fontSize: '0.85rem', color: '#2d7a2d' }}>✅ Have: {rec.matched ? rec.matched.join(', ') : 'None'}</p>
+                {rec.missing && rec.missing.length > 0 && (
+                  <p style={{ fontSize: '0.85rem', color: '#d9534f' }}>🛒 Need: {rec.missing.join(', ')}</p>
                 )}
               </div>
             ))}
