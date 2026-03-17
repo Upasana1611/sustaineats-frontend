@@ -77,7 +77,7 @@ const Login = () => {
         // ✅ CHECK EMAIL INSTEAD OF ROLE
       if (email.includes("@admin")) {
         localStorage.setItem("role", "admin");
-      navigate("/admin-dashboard");
+      navigate("/admin");
         } else {
        localStorage.setItem("role", "user");
      navigate("/home");
