@@ -7,7 +7,8 @@ const Feedback = () => {
   const [recipeName, setRecipeName] = useState("");
   const [rating, setRating] = useState(5);
   const [comments, setComments] = useState("");
-  const userEmail = localStorage.getItem("userEmail");
+  const userEmail = localStorage.getItem("email") || localStorage.getItem("userEmail");
+  const token = localStorage.getItem("token");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +22,10 @@ const Feedback = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/feedback`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(feedbackData)
       });
 

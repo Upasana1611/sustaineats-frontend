@@ -12,14 +12,16 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  const token = localStorage.getItem("token");
+  const userRole = localStorage.getItem("role");
+  
   // Report Generation State
   const [showReport, setShowReport] = useState(false);
   const [reportData, setReportData] = useState(null);
 
   // Authentication Check
   useEffect(() => {
-    const email = localStorage.getItem("email");
-    if (!email || !email.includes("@admin")) {
+    if (!token || userRole !== "admin") {
       navigate("/");
     } else {
       fetchAllData();
@@ -31,9 +33,9 @@ const AdminDashboard = () => {
     setError(null);
     try {
       const [statsRes, usersRes, wasteRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/admin/stats`),
-        fetch(`${API_BASE_URL}/admin/users`),
-        fetch(`${API_BASE_URL}/admin/waste-reports`)
+        fetch(`${API_BASE_URL}/admin/stats`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_BASE_URL}/admin/users`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_BASE_URL}/admin/waste-reports`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
 
       if (!statsRes.ok || !usersRes.ok || !wasteRes.ok) {
@@ -61,6 +63,7 @@ const AdminDashboard = () => {
     try {
       const res = await fetch(`${API_BASE_URL}/admin/delete-user/${email}`, {
         method: "DELETE",
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (res.ok) {

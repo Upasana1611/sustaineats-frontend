@@ -51,8 +51,34 @@ const Profile = () => {
       }
   };
 
+  const fetchProfileData = async () => {
+      if (!userEmail || !token) return;
+      try {
+          const res = await fetch(`${API_BASE_URL}/profile/${userEmail}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+              const data = await res.json();
+              setFormData({
+                  age: data.age || '',
+                  height: data.height || '',
+                  weight: data.weight || '',
+                  healthCondition: data.healthCondition || 'None',
+                  dietPreference: data.dietPreference || 'Veg',
+                  bmi: data.bmi || ''
+              });
+              if (data.height && data.weight) {
+                  calculateBMI(data.height, data.weight);
+              }
+          }
+      } catch (err) {
+          console.error("Error fetching profile:", err);
+      }
+  };
+
   useEffect(() => {
       fetchStats();
+      fetchProfileData();
   }, [userEmail]);
 
   const calculateBMI = (h, w) => {
