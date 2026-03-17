@@ -19,12 +19,38 @@ const Profile = () => {
 
   const [bmiCategory, setBmiCategory] = useState('');
 
-  const [journeyData] = useState({
-    totalRecipes: 12,
-    carbonSaved: "8.4 kg",
-    avgEcoScore: "7.5",
+  const [journeyData, setJourneyData] = useState({
+    itemsSaved: 0,
+    co2Emitted: "0 kg",
+    moneyLost: "$0.00",
+    ecoScore: 0,
+    badges: [],
     memberSince: "Feb 2026"
   });
+
+  const fetchStats = async () => {
+      if (!userEmail) return;
+      try {
+          const res = await fetch(`${API_BASE_URL}/user-stats/${userEmail}`);
+          if (res.ok) {
+              const data = await res.json();
+              setJourneyData(prev => ({
+                  ...prev,
+                  itemsSaved: data.itemsSaved,
+                  co2Emitted: data.co2Emitted,
+                  moneyLost: data.moneyLost,
+                  ecoScore: data.ecoScore,
+                  badges: data.badges
+              }));
+          }
+      } catch (err) {
+          console.error("Error fetching stats:", err);
+      }
+  };
+
+  useEffect(() => {
+      fetchStats();
+  }, [userEmail]);
 
   const calculateBMI = (h, w) => {
     if (h && w) {
@@ -111,22 +137,37 @@ const Profile = () => {
 
                 <div style={statBox}>
                   <span style={statIcon}>🌱</span>
-                  <span style={statVal}>{journeyData.carbonSaved}</span>
-                  <p style={statLab}>CO2 Saved</p>
+                  <span style={statVal}>{journeyData.ecoScore}</span>
+                  <p style={statLab}>Eco-Score</p>
                 </div>
 
                 <div style={statBox}>
                   <span style={statIcon}>🍳</span>
-                  <span style={statVal}>{journeyData.totalRecipes}</span>
-                  <p style={statLab}>Meals Cooked</p>
+                  <span style={statVal}>{journeyData.itemsSaved}</span>
+                  <p style={statLab}>Items Saved</p>
                 </div>
 
                 <div style={statBox}>
-                  <span style={statIcon}>⚖️</span>
-                  <span style={statVal}>{formData.bmi || '--'}</span>
-                  <p style={statLab}>Current BMI</p>
+                  <span style={statIcon}>💵</span>
+                  <span style={{...statVal, color: '#ff4d4d'}}>{journeyData.moneyLost}</span>
+                  <p style={statLab}>Loss to Waste</p>
                 </div>
 
+              </div>
+
+              <div style={badgeContainer}>
+                 <h3 style={sectionTitle}>🏆 My Eco-Badges</h3>
+                 {journeyData.badges.length === 0 ? (
+                     <p style={{color: '#aaa', fontSize: '0.9rem'}}>Save more items to earn badges!</p>
+                 ) : (
+                     <div style={{display: 'flex', gap: '15px', flexWrap: 'wrap'}}>
+                         {journeyData.badges.map((b, i) => (
+                             <div key={i} style={badgeStyle}>
+                                 {b === "Zero-Waste Hero" ? "🦸‍♂️" : "🛡️"} {b}
+                             </div>
+                         ))}
+                     </div>
+                 )}
               </div>
 
               <div style={infoDetails}>
@@ -418,16 +459,9 @@ const radioLabel = {
   cursor: 'pointer'
 };
 
-const saveBtn = {
-  width: '100%',
-  backgroundColor: '#ffcc33',
-  color: '#000',
-  padding: '15px',
-  border: 'none',
-  borderRadius: '50px',
-  fontWeight: 'bold',
-  cursor: 'pointer',
-  marginTop: '20px'
-};
+const saveBtn = { width: '100%', backgroundColor: '#ffcc33', color: '#000', padding: '15px', border: 'none', borderRadius: '50px', fontWeight: 'bold', cursor: 'pointer', marginTop: '20px' };
+
+const badgeContainer = { background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '20px', marginBottom: '30px' };
+const badgeStyle = { background: 'linear-gradient(135deg, #ffcc33, #e6a800)', color: '#000', padding: '8px 15px', borderRadius: '30px', fontWeight: 'bold', fontSize: '0.9rem', boxShadow: '0 4px 10px rgba(255,204,51,0.3)' };
 
 export default Profile;

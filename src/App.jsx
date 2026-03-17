@@ -8,6 +8,7 @@ import Profile from './Profile';
 import Feedback from './Feedback';
 import Recipes from './Recipes'; 
 import AdminDashboard from "./AdminDashboard";
+import ShoppingList from './ShoppingList';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         {/* 3. Added the Recipes Route */}
         <Route path="/recipes" element={<Recipes />} /> 
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/shopping-list" element={<ShoppingList />} />
       </Routes>
     </Router>
   );

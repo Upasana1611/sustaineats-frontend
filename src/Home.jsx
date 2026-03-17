@@ -39,6 +39,7 @@ const Home = () => {
           <Link to="/home" style={activeNavLink}>Home</Link>
           <a href="#about-us" style={navLink}>About</a> 
           <Link to="/recipes" style={navLink}>Recipes</Link>
+          <Link to="/shopping-list" style={navLink}>Shopping List</Link>
           <Link to="/profile" style={navLink}>Profile</Link>
           <Link to="/feedback" style={navLink}>Feedback</Link>
           <button onClick={handleLogout} style={logoutBtnStyle}>Logout</button>

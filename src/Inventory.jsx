@@ -8,8 +8,9 @@ import API_BASE_URL from './config';
 
 const Inventory = () => {
   const [items, setItems] = useState([]);
-  const [newItem, setNewItem] = useState({ name: '', quantity: '', expiry: '' });
+  const [newItem, setNewItem] = useState({ name: '', quantity: '', expiry: '', storage: 'Fridge' });
   const [suggestions, setSuggestions] = useState([]); 
+  const [activeStorageTab, setActiveStorageTab] = useState('Fridge');
   
   const userEmail = localStorage.getItem("email");
   const navigate = useNavigate();
@@ -37,6 +38,19 @@ const Inventory = () => {
 
   useEffect(() => { fetchInventory(); }, [userEmail]);
 
+  const addToShoppingList = async (missingItems) => {
+      try {
+          const res = await fetch(`${API_BASE_URL}/shopping-list`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: userEmail, action: 'add', items: missingItems })
+          });
+          if (res.ok) alert("Added to Shopping List! Check it out in the Navbar.");
+      } catch (err) {
+          console.error(err);
+      }
+  };
+
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
@@ -45,7 +59,7 @@ const Inventory = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...newItem, email: userEmail })
       });
-      if (res.ok) { fetchInventory(); setNewItem({ name: '', quantity: '', expiry: '' }); }
+      if (res.ok) { fetchInventory(); setNewItem({ name: '', quantity: '', expiry: '', storage: 'Fridge' }); }
     } catch (err) { console.error("Add error:", err); }
   };
 
@@ -73,7 +87,16 @@ const Inventory = () => {
              <span>User: <b style={{color: '#ffcc33'}}>{userEmail}</b></span>
         </div>
 
-        <h1 style={mainTitle}>My Digital Fridge 🧊</h1>
+        {items.filter(item => {
+           const days = Math.ceil((new Date(item.expiry) - new Date()) / (1000 * 60 * 60 * 24));
+           return days <= 2 && days > 0;
+        }).length > 0 && (
+           <div style={alertBanner}>
+              ⚠️ You have items expiring in the next 2 days! Let's cook something with them!
+           </div>
+        )}
+
+        <h1 style={mainTitle}>My Supply 🧊</h1>
 
         <div style={mainGrid}>
           {/* Add Form with Blur effect */}
@@ -85,14 +108,26 @@ const Inventory = () => {
                 <label style={{ fontSize: '0.8rem', color: '#ccc' }}>Expiry Date:</label>
                 <input type="date" value={newItem.expiry} onChange={e => setNewItem({...newItem, expiry: e.target.value})} style={inputStyle} required />
             </div>
-            <button type="submit" style={addBtnStyle}>ADD TO FRIDGE</button>
+            <select value={newItem.storage} onChange={e => setNewItem({...newItem, storage: e.target.value})} style={inputStyle}>
+                <option value="Fridge">Fridge</option>
+                <option value="Pantry">Pantry</option>
+                <option value="Freezer">Freezer</option>
+            </select>
+            <button type="submit" style={addBtnStyle}>ADD TO INVENTORY</button>
           </form>
 
           {/* Stock List */}
           <div style={stockListContainer}>
             <h3 style={{ margin: '0 0 15px 0', color: '#ffcc33' }}>Current Stock</h3>
-            {items.length === 0 ? <p>Your fridge is empty!</p> : 
-              items.map((item, index) => {
+            
+            <div style={storageTabs}>
+                <button style={activeStorageTab === 'Fridge' ? activeTabBtn : tabBtn} onClick={() => setActiveStorageTab('Fridge')}>Fridge</button>
+                <button style={activeStorageTab === 'Pantry' ? activeTabBtn : tabBtn} onClick={() => setActiveStorageTab('Pantry')}>Pantry</button>
+                <button style={activeStorageTab === 'Freezer' ? activeTabBtn : tabBtn} onClick={() => setActiveStorageTab('Freezer')}>Freezer</button>
+            </div>
+
+            {items.filter(item => (item.storage || 'Fridge') === activeStorageTab).length === 0 ? <p>Your {activeStorageTab.toLowerCase()} is empty!</p> : 
+              items.filter(item => (item.storage || 'Fridge') === activeStorageTab).map((item, index) => {
                 const today = new Date();
                 const expiryDate = new Date(item.expiry);
                 const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
@@ -109,7 +144,10 @@ const Inventory = () => {
                       <strong style={{ fontSize: '1.1rem', color: '#333' }}>{item.name}</strong>
                       <div style={{ fontSize: '0.85rem', color: '#666' }}>Qty: {item.quantity} | <b style={{color: statusColor}}>{statusText}</b></div>
                     </div>
-                    <button onClick={() => handleDelete(item.name)} style={deleteBtn}>✕</button>
+                    <div>
+                        {/* Gamification feature placeholder: We can consume or waste */}
+                        <button onClick={() => handleDelete(item.name)} style={deleteBtn} title="Consume / Delete">✔️</button>
+                    </div>
                   </div>
                 );
               })}
@@ -127,9 +165,12 @@ const Inventory = () => {
               <div key={i} style={recipeCard}>
                 <h4 style={{ color: '#2d7a2d', margin: '0 0 10px 0' }}>{rec.recipe_name}</h4>
                 <p style={{ fontSize: '0.85rem', color: '#444' }}>🌍 Eco-Score: <b>{rec.sustainability_score || 8}/10</b></p>
-                <p style={{ fontSize: '0.85rem', color: '#2d7a2d' }}>✅ Have: {rec.matched ? rec.matched.join(', ') : 'None'}</p>
+                <p style={{ fontSize: '0.85rem', color: '#2d7a2d' }}>✅ Have: {rec.matched && rec.matched.length > 0 ? rec.matched.join(', ') : 'None'}</p>
                 {rec.missing && rec.missing.length > 0 && (
-                  <p style={{ fontSize: '0.85rem', color: '#d9534f' }}>🛒 Need: {rec.missing.join(', ')}</p>
+                  <>
+                    <p style={{ fontSize: '0.85rem', color: '#d9534f', margin: '5px 0' }}>🛒 Need: {rec.missing.join(', ')}</p>
+                    <button onClick={() => addToShoppingList(rec.missing)} style={addToCartBtn}>+ Add Missing to List</button>
+                  </>
                 )}
               </div>
             ))}
@@ -160,9 +201,15 @@ const suggestionSection = { marginTop: '50px', textAlign: 'center' };
 const suggestBtn = { padding: '15px 40px', borderRadius: '50px', border: 'none', backgroundColor: '#ffcc33', color: '#000', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer' };
 const suggestionGrid = { marginTop: '30px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' };
 const recipeCard = { backgroundColor: 'white', color: '#333', padding: '20px', borderRadius: '25px', textAlign: 'left', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' };
+const addToCartBtn = { marginTop: '10px', padding: '8px 15px', borderRadius: '10px', border: 'none', backgroundColor: '#7ec335', color: 'white', fontWeight: 'bold', cursor: 'pointer', width: '100%' };
 
 const decoSalmon = { position: 'absolute', top: '-40px', left: '-40px', width: '220px', opacity: 0.8 };
 const decoOlives = { position: 'absolute', top: '20px', right: '10px', width: '130px', opacity: 0.8 };
 const decoTomato = { position: 'absolute', bottom: '-20px', left: '20px', width: '160px', opacity: 0.8 };
+
+const alertBanner = { backgroundColor: '#ff4d4d', color: 'white', padding: '15px', borderRadius: '15px', marginBottom: '20px', fontWeight: 'bold', textAlign: 'center', boxShadow: '0 4px 15px rgba(255, 77, 77, 0.4)' };
+const storageTabs = { display: 'flex', gap: '10px', marginBottom: '20px' };
+const tabBtn = { background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: '1rem', padding: '5px 10px' };
+const activeTabBtn = { ...tabBtn, color: '#ffcc33', borderBottom: '2px solid #ffcc33', fontWeight: 'bold' };
 
 export default Inventory;
