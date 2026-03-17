@@ -11,7 +11,7 @@ const Inventory = () => {
   const [newItem, setNewItem] = useState({ name: '', quantity: '', expiry: '' });
   const [suggestions, setSuggestions] = useState([]); 
   
-  const userEmail = localStorage.getItem("userEmail");
+  const userEmail = localStorage.getItem("email");
   const navigate = useNavigate();
 
   const fetchInventory = async () => {
