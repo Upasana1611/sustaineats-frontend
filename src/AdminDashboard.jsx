@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "./config";
-import "./AdminDashboard.css"; // Ensure this CSS file exists in the correct folder
+import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -11,12 +11,16 @@ const AdminDashboard = () => {
   const [wasteReports, setWasteReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Report Generation State
+  const [showReport, setShowReport] = useState(false);
+  const [reportData, setReportData] = useState(null);
 
   // Authentication Check
   useEffect(() => {
     const email = localStorage.getItem("email");
     if (!email || !email.includes("@admin")) {
-      navigate("/"); // Redirect to login if not admin
+      navigate("/");
     } else {
       fetchAllData();
     }
@@ -71,6 +75,57 @@ const AdminDashboard = () => {
     }
   };
 
+  const generateReport = () => {
+    // Analytics calculations based on user requirements
+    // 1. Total Waste
+    const totalWasteLogs = wasteReports.length;
+    
+    // 2. Financial & Environmental Impact Estimations
+    // Assume average $3.50 lost per wasted item and 2.5kg CO2
+    const totalCostLost = (totalWasteLogs * 3.50).toFixed(2);
+    const co2Emissions = (totalWasteLogs * 2.5).toFixed(1);
+
+    // 3. Most wasted items
+    const itemCounts = {};
+    wasteReports.forEach(w => {
+      const name = w.item_name || "Unknown";
+      itemCounts[name] = (itemCounts[name] || 0) + (parseInt(w.quantity) || 1);
+    });
+
+    let mostWasted = "N/A";
+    let max = 0;
+    for (let item in itemCounts) {
+      if (itemCounts[item] > max) {
+        max = itemCounts[item];
+        mostWasted = item;
+      }
+    }
+
+    // 4. Worst Offenders (Users who waste the most)
+    const userWastes = {};
+    wasteReports.forEach(w => {
+      userWastes[w.email] = (userWastes[w.email] || 0) + 1;
+    });
+    let topOffender = "N/A";
+    let offMax = 0;
+    for (let u in userWastes) {
+      if (userWastes[u] > offMax) {
+        offMax = userWastes[u];
+        topOffender = u;
+      }
+    }
+
+    setReportData({
+      totalLogs: totalWasteLogs,
+      costLost: `$${totalCostLost}`,
+      emissions: `${co2Emissions} kg`,
+      mostWasted: mostWasted,
+      topOffender: topOffender
+    });
+    
+    setShowReport(true);
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
@@ -85,7 +140,7 @@ const AdminDashboard = () => {
           <p>{stats.totalUsers || 0}</p>
         </div>
         <div className="card">
-          <h3>Total Waste Items</h3>
+          <h3>Total Wasted Items</h3>
           <p>{stats.totalWasteItems || 0}</p>
         </div>
         <div className="card">
@@ -94,14 +149,13 @@ const AdminDashboard = () => {
         </div>
       </div>
       
-      {/* Mini previews on main dashboard */}
       <div className="admin-section">
         <h2>Recent Users</h2>
         {renderUsersTable(users.slice(0, 5))}
       </div>
       
       <div className="admin-section">
-        <h2>Recent Waste Reports</h2>
+        <h2>Recent Expirations (Waste Logs)</h2>
         {renderWasteTable(wasteReports.slice(0, 5))}
       </div>
     </>
@@ -132,7 +186,7 @@ const AdminDashboard = () => {
                     className="delete-btn"
                     onClick={() => handleDeleteUser(u.email)}
                   >
-                    Delete
+                    Remove
                   </button>
                 </td>
               </tr>
@@ -145,7 +199,7 @@ const AdminDashboard = () => {
 
   const renderWasteTable = (wasteList) => {
      if (!wasteList || wasteList.length === 0) {
-      return <div className="empty-state">No waste records found.</div>;
+      return <div className="empty-state">No waste records found in fridges.</div>;
     }
 
     return (
@@ -154,8 +208,9 @@ const AdminDashboard = () => {
           <thead>
             <tr>
               <th>User Email</th>
-              <th>Item Name</th>
-              <th>Waste Date</th>
+              <th>Spoiled Item</th>
+              <th>Qty</th>
+              <th>Date Marked Waste</th>
             </tr>
           </thead>
           <tbody>
@@ -163,6 +218,7 @@ const AdminDashboard = () => {
               <tr key={w._id?.$oid || i}>
                 <td>{w.email || "Unknown"}</td>
                 <td>{w.item_name || "Unknown Item"}</td>
+                <td>{w.quantity || 1}</td>
                 <td>{w.waste_date || "Unknown Date"}</td>
               </tr>
             ))}
@@ -172,8 +228,44 @@ const AdminDashboard = () => {
     );
   };
 
+  const renderWasteReportView = () => {
+    return (
+      <div className="admin-section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2>Waste Tracking & Sustainability Report</h2>
+          <button className="generate-report-btn" onClick={generateReport}>
+            ⚡ Generate Deep Report
+          </button>
+        </div>
+
+        {showReport && reportData && (
+          <div className="report-insights">
+             <div className="insight-card danger">
+                <h4>Est. Financial Loss</h4>
+                <div className="value">{reportData.costLost}</div>
+             </div>
+             <div className="insight-card danger">
+                <h4>Est. CO₂ Footprint</h4>
+                <div className="value">{reportData.emissions}</div>
+             </div>
+             <div className="insight-card">
+                <h4>Most Wasted Food</h4>
+                <div className="value" style={{textTransform: 'capitalize'}}>{reportData.mostWasted}</div>
+             </div>
+             <div className="insight-card">
+                <h4>Top Waster (Email)</h4>
+                <div className="value" style={{fontSize: '1.2rem', marginTop: '10px'}}>{reportData.topOffender}</div>
+             </div>
+          </div>
+        )}
+
+        {renderWasteTable(wasteReports)}
+      </div>
+    );
+  };
+
   const renderContent = () => {
-    if (loading) return <div className="loading-fallback">Loading dashboard data...</div>;
+    if (loading) return <div className="loading-fallback">⚡ Syncing live matrix data...</div>;
     if (error) return <div className="error-fallback">{error}</div>;
 
     switch (activeTab) {
@@ -187,17 +279,12 @@ const AdminDashboard = () => {
           </div>
         );
       case "waste":
-        return (
-           <div className="admin-section">
-            <h2>Waste Reports Log</h2>
-            {renderWasteTable(wasteReports)}
-          </div>
-        );
+        return renderWasteReportView();
       case "recipes":
         return (
           <div className="admin-section">
-             <h2>Recipes Log</h2>
-             <div className="empty-state">Currently managing {stats.totalRecipes || 0} recipes. Recipe module coming soon!</div>
+             <h2>Global Recipes</h2>
+             <div className="empty-state">Currently managing {stats.totalRecipes || 0} recipes. Global directory syncing...</div>
           </div>
         )
       default:
@@ -211,38 +298,38 @@ const AdminDashboard = () => {
       <aside className="admin-sidebar">
         <h2>SustainEats</h2>
         <nav>
-          <span 
+          <button 
             className={`sidebar-link ${activeTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveTab('dashboard')}
           >
             Dashboard
-          </span>
-          <span 
+          </button>
+          <button 
             className={`sidebar-link ${activeTab === 'users' ? 'active' : ''}`}
             onClick={() => setActiveTab('users')}
           >
             Users
-          </span>
-          <span 
+          </button>
+          <button 
             className={`sidebar-link ${activeTab === 'waste' ? 'active' : ''}`}
             onClick={() => setActiveTab('waste')}
           >
             Waste Reports
-          </span>
-           <span 
+          </button>
+           <button 
             className={`sidebar-link ${activeTab === 'recipes' ? 'active' : ''}`}
             onClick={() => setActiveTab('recipes')}
           >
             Recipes
-          </span>
+          </button>
         </nav>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        <button className="logout-btn" onClick={handleLogout}>Disconnect</button>
       </aside>
 
       {/* Main Content Area */}
       <main className="admin-main-content">
         <header className="admin-header">
-          <h1>Admin Dashboard</h1>
+          <h1>Control Center</h1>
         </header>
         
         {renderContent()}
