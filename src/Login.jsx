@@ -32,7 +32,6 @@ const Login = () => {
     color: '#1a4d1a',
     boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
     textAlign: 'center',
-    border: '1px solid rgba(255, 255, 255, 0.4)',
   };
 
   const inputStyle = {
@@ -41,9 +40,7 @@ const Login = () => {
     border: '1px solid #ddd',
     outline: 'none',
     fontSize: '1rem',
-    backgroundColor: 'white',
     width: '100%',
-    boxSizing: 'border-box'
   };
 
   const buttonStyle = {
@@ -56,7 +53,6 @@ const Login = () => {
     fontSize: '1.1rem',
     cursor: 'pointer',
     width: '100%',
-    transition: 'transform 0.2s ease, background 0.2s ease',
   };
 
   const handleLogin = async (e) => {
@@ -72,36 +68,40 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("userEmail", email);
-        localStorage.setItem("userName", data.name || "User");
+        // ✅ FIXED STORAGE
+        localStorage.setItem("email", data.email);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("name", data.name);
 
-        if (data.role === 'admin') {
-          navigate('/admin-dashboard');
+        // ✅ ROLE BASED REDIRECT
+        // ✅ CHECK EMAIL INSTEAD OF ROLE
+      if (email.includes("@admin")) {
+        localStorage.setItem("role", "admin");
+      navigate("/admin-dashboard");
         } else {
-          navigate('/home');
+       localStorage.setItem("role", "user");
+     navigate("/home");
         }
+
       } else {
         alert(data.message || "Invalid credentials");
       }
 
     } catch (error) {
       console.error("Login error:", error);
-      alert("Login failed. Please check your email or password.");
+      alert("Login failed. Try again.");
     }
   };
 
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <h2 style={{ fontSize: '2.5rem', marginBottom: '8px', color: '#1a4d1a' }}>Login</h2>
-        <p style={{ marginBottom: '35px', color: '#666', fontSize: '0.95rem' }}>
-          Enter your credentials to manage your sustainable kitchen.
-        </p>
+        <h2>Login</h2>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <input
             type="email"
-            placeholder="Email Address"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             style={inputStyle}
@@ -122,8 +122,8 @@ const Login = () => {
           </button>
         </form>
 
-        <p style={{ marginTop: '25px', color: '#444' }}>
-          New here? <Link to="/register" style={{ color: '#7ec335', fontWeight: 'bold', textDecoration: 'none' }}>Create an account</Link>
+        <p style={{ marginTop: '20px' }}>
+          New user? <Link to="/register">Register</Link>
         </p>
       </div>
     </div>

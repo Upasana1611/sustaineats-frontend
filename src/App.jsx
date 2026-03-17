@@ -4,7 +4,7 @@ import Login from './Login';
 import Register from './Register';
 import Home from './Home';
 import Inventory from './Inventory';
-import AdminDashboard from './AdminDashboard';
+import AdminDashboard from "./AdminDashboard";
 import Profile from './Profile'; 
 import Feedback from './Feedback';
 import Recipes from './Recipes'; // 1. Added this import
