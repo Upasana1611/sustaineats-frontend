@@ -37,7 +37,7 @@ const Recipes = () => {
         }
     } catch (error) {
         console.error("AI Recipe Error:", error);
-        alert("An error occurred while talking to the AI Chef.");
+        alert(`An error occurred while talking to the AI Chef: ${error.message}. Please check if the backend URL is correct and the server is running.`);
     } finally {
         setIsGenerating(false);
     }
