@@ -6,12 +6,15 @@ const ShoppingList = () => {
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState('');
   const userEmail = localStorage.getItem("email") || localStorage.getItem("userEmail");
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   const fetchShoppingList = async () => {
-    if (!userEmail) return;
+    if (!userEmail || !token) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/shopping-list/${userEmail}`);
+      const res = await fetch(`${API_BASE_URL}/shopping-list/${userEmail}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
     } catch (err) { console.error("Fetch error:", err); }
@@ -28,7 +31,10 @@ const ShoppingList = () => {
     try {
       const res = await fetch(`${API_BASE_URL}/shopping-list`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ action: "add", items: [newItem.trim()], email: userEmail })
       });
       if (res.ok) { fetchShoppingList(); setNewItem(''); }
@@ -39,7 +45,10 @@ const ShoppingList = () => {
     try {
         const res = await fetch(`${API_BASE_URL}/shopping-list`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ action: "remove", items: [itemName], email: userEmail })
         });
         if (res.ok) fetchShoppingList();

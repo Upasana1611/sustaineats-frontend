@@ -5,8 +5,9 @@ import API_BASE_URL from './config';
 const Profile = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
-  const userEmail = localStorage.getItem("userEmail");
-  const userName = localStorage.getItem("userName") || "User";
+  const userEmail = localStorage.getItem("email") || localStorage.getItem("userEmail");
+  const userName = localStorage.getItem("name") || localStorage.getItem("userName") || "User";
+  const token = localStorage.getItem("token");
 
   const [formData, setFormData] = useState({
     age: '',
@@ -29,9 +30,11 @@ const Profile = () => {
   });
 
   const fetchStats = async () => {
-      if (!userEmail) return;
+      if (!userEmail || !token) return;
       try {
-          const res = await fetch(`${API_BASE_URL}/user-stats/${userEmail}`);
+          const res = await fetch(`${API_BASE_URL}/user-stats/${userEmail}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
           if (res.ok) {
               const data = await res.json();
               setJourneyData(prev => ({
@@ -85,7 +88,10 @@ const Profile = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/update-profile`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ email: userEmail, ...formData }),
       });
 

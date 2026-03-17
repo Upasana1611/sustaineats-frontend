@@ -68,19 +68,20 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // ✅ FIXED STORAGE
+        // Clear old session
+        localStorage.clear();
+        
+        // Include JWT & User data
         localStorage.setItem("email", data.email);
         localStorage.setItem("role", data.role);
         localStorage.setItem("name", data.name);
+        localStorage.setItem("token", data.token);
 
-        // ✅ ROLE BASED REDIRECT
-        // ✅ CHECK EMAIL INSTEAD OF ROLE
-      if (email.includes("@admin")) {
-        localStorage.setItem("role", "admin");
-      navigate("/admin");
+        // Secure ROLE BASED REDIRECT using backend data
+        if (data.role === "admin") {
+          navigate("/admin");
         } else {
-       localStorage.setItem("role", "user");
-     navigate("/home");
+          navigate("/home");
         }
 
       } else {

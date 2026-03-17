@@ -1,10 +1,47 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import API_BASE_URL from './config';
 
 const Recipes = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const userEmail = localStorage.getItem("email") || localStorage.getItem("userEmail");
+  const token = localStorage.getItem("token");
+
+  const handleGenerateAIRecipe = async () => {
+    if (!userEmail || !token) {
+        alert("Please log in to use the AI Recipe Generator.");
+        return;
+    }
+    setIsGenerating(true);
+    try {
+        const response = await fetch(`${API_BASE_URL}/generate-ai-recipe/${userEmail}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+            setSelectedRecipe({
+                id: 'ai-generated',
+                name: "✨ AI Chef's Creation ✨",
+                time: "Flexible",
+                servings: "Custom",
+                calories: "Varies",
+                ingredients: ["Check the recipe text below for full details!"],
+                steps: data.recipe_text.split('\n').filter(line => line.trim() !== '')
+            });
+        } else {
+            alert(data.error || "Failed to generate recipe.");
+        }
+    } catch (error) {
+        console.error("AI Recipe Error:", error);
+        alert("An error occurred while talking to the AI Chef.");
+    } finally {
+        setIsGenerating(false);
+    }
+  };
 
   const allRecipes = [
   // --- 1. NORTH INDIAN CLASSICS ---
@@ -480,6 +517,13 @@ const Recipes = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+        <button 
+            onClick={handleGenerateAIRecipe} 
+            style={aiButtonStyle}
+            disabled={isGenerating}
+        >
+            {isGenerating ? "🤖 AI is thinking..." : "🪄 Ask AI for Custom Recipe (from Fridge)"}
+        </button>
       </header>
       <div style={recipeGrid}>
         {filteredRecipes.map((recipe) => (
@@ -547,5 +591,20 @@ const sectionTitle = { color: '#052a1a', fontSize: '24px', marginBottom: '20px',
 const listStyle = { listStyle: 'none', padding: 0 };
 const listItem = { fontSize: '16px', marginBottom: '10px', lineHeight: '1.6' };
 const section = { padding: '0 10px' };
+
+const aiButtonStyle = {
+  backgroundColor: '#99ff66',
+  color: '#052a1a',
+  padding: '15px 30px',
+  borderRadius: '50px',
+  border: 'none',
+  fontWeight: 'bold',
+  fontSize: '16px',
+  cursor: 'pointer',
+  boxShadow: '0 4px 15px rgba(153, 255, 102, 0.3)',
+  transition: 'all 0.3s ease',
+  marginTop: '10px',
+  marginBottom: '30px'
+};
 
 export default Recipes;

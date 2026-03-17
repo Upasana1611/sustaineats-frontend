@@ -12,22 +12,27 @@ const Inventory = () => {
   const [suggestions, setSuggestions] = useState([]); 
   const [activeStorageTab, setActiveStorageTab] = useState('Fridge');
   
-  const userEmail = localStorage.getItem("email");
+  const userEmail = localStorage.getItem("email") || localStorage.getItem("userEmail");
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   const fetchInventory = async () => {
-    if (!userEmail) return;
+    if (!userEmail || !token) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/inventory/${userEmail}`);
+      const res = await fetch(`${API_BASE_URL}/inventory/${userEmail}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
     } catch (err) { console.error("Fetch error:", err); }
   };
 
   const getRecipeSuggestions = async () => {
-    if (!userEmail) return;
+    if (!userEmail || !token) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`);
+      const res = await fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
       const data = await res.json();
       setSuggestions(data);
     } catch (err) {
@@ -42,7 +47,10 @@ const Inventory = () => {
       try {
           const res = await fetch(`${API_BASE_URL}/shopping-list`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
               body: JSON.stringify({ email: userEmail, action: 'add', items: missingItems })
           });
           if (res.ok) alert("Added to Shopping List! Check it out in the Navbar.");
@@ -56,7 +64,10 @@ const Inventory = () => {
     try {
       const res = await fetch(`${API_BASE_URL}/inventory`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ ...newItem, email: userEmail })
       });
       if (res.ok) { fetchInventory(); setNewItem({ name: '', quantity: '', expiry: '', storage: 'Fridge' }); }
@@ -67,7 +78,10 @@ const Inventory = () => {
     try {
         const res = await fetch(`${API_BASE_URL}/inventory/delete`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ name: itemName, email: userEmail })
         });
         if (res.ok) fetchInventory();

@@ -11,11 +11,14 @@ import biryaniImg from './assets/biryaniImg.png';
 const Home = () => {
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
-  const userEmail = localStorage.getItem("userEmail");
+  const userEmail = localStorage.getItem("email") || localStorage.getItem("userEmail");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-  if (userEmail) {
-    fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`)
+  if (userEmail && token) {
+    fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
       .then((res) => res.json())
       .then((data) => setRecipes(data.slice(0, 3)))
       .catch((err) => console.error("Error fetching recipes:", err));
