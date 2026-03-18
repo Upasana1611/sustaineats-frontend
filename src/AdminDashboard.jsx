@@ -99,25 +99,69 @@ const AdminDashboard = () => {
       };
     });
 
+    // Pricing Helper
+    const calculateItemCost = (itemName, quantityStr) => {
+      const name = itemName ? itemName.toLowerCase().trim() : "unknown";
+      const qStr = String(quantityStr || "1").toLowerCase();
+      const qtyMatch = qStr.match(/(\d+(\.\d+)?)\s*([a-z]*)/);
+      
+      if (!qtyMatch) return 0;
+      
+      let amount = parseFloat(qtyMatch[1]);
+      const unit = qtyMatch[3] || "";
+      
+      const prices = {
+        tomato: 40,
+        onion: 30,
+        egg: 7,
+        eggs: 7,
+        pasta: 20,
+        chicken: 150,
+        milk: 60,
+        bread: 45,
+        default: 40
+      };
+      
+      let price = prices.default;
+      for (const key in prices) {
+        if (name.includes(key)) {
+          price = prices[key];
+          break;
+        }
+      }
+      
+      // Conversion logic
+      if (unit === 'g') {
+        return (amount / 1000) * price;
+      }
+      return amount * price;
+    };
+
     // Aggregate Data
     wasteReports.forEach(w => {
       const email = w.email ? w.email.toLowerCase().trim() : "Unknown";
       const name = w.item_name || "Unknown";
-      const qty = parseInt(w.quantity) || 1;
+      const rawQty = w.quantity || "1";
 
-      // Global Totals
-      totalCostLost += qty * 250;
-      totalCo2 += qty * 2.5;
-      globalItems[name] = (globalItems[name] || 0) + qty;
+      // Financial Calculation
+      const itemCost = calculateItemCost(name, rawQty);
+      
+      // CO2 Calculation (Simplified: 2.5kg per kg of generic waste)
+      const qtyForCo2 = rawQty.toString().includes('g') ? parseFloat(rawQty)/1000 : parseFloat(rawQty);
+      const itemCo2 = (qtyForCo2 || 1) * 2.5;
 
-      // Per-User Totals (Update if user already in stats, or add if legacy/unknown)
+      totalCostLost += itemCost;
+      totalCo2 += itemCo2;
+      globalItems[name] = (globalItems[name] || 0) + (parseFloat(rawQty) || 1);
+
+      // Per-User Totals
       if (!userStats[email]) {
         userStats[email] = { email, totalWasted: 0, costLost: 0, co2: 0, items: {} };
       }
-      userStats[email].totalWasted += qty;
-      userStats[email].costLost += qty * 250;
-      userStats[email].co2 += qty * 2.5;
-      userStats[email].items[name] = (userStats[email].items[name] || 0) + qty;
+      userStats[email].totalWasted += (parseFloat(rawQty) || 1);
+      userStats[email].costLost += itemCost;
+      userStats[email].co2 += itemCo2;
+      userStats[email].items[name] = (userStats[email].items[name] || 0) + (parseFloat(rawQty) || 1);
     });
 
     // Global Insights Calculation
