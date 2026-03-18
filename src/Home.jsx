@@ -29,8 +29,39 @@ const Home = () => {
     navigate('/');
   };
 
+  const aboutAnimations = `
+    @keyframes revealUp {
+      0% { opacity: 0; transform: translateY(50px) scale(0.9); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .about-reveal {
+      animation: revealUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .mission-card-3d {
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      background: rgba(255, 255, 255, 0.03) !important;
+      backdrop-filter: blur(20px) !important;
+    }
+    .mission-card-3d:hover {
+      transform: translateY(-15px) scale(1.03) rotateX(2deg) rotateY(2deg);
+      background: rgba(153, 255, 102, 0.08) !important;
+      border-color: rgba(153, 255, 102, 0.4) !important;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 20px rgba(153, 255, 102, 0.2);
+    }
+    .mission-card-3d:hover .mission-icon-animate {
+      transform: scale(1.2) rotate(10deg);
+      filter: drop-shadow(0 0 10px rgba(153, 255, 102, 0.8));
+    }
+    .mission-icon-animate {
+      transition: all 0.5s ease;
+      display: inline-block;
+    }
+  `;
+
   return (
     <div style={mainContainer}>
+      <style>{aboutAnimations}</style>
       {/* --- ATTRACTIVE NAVBAR WITH LOGOUT --- */}
       <nav style={navbarStyle}>
         <div style={logoStyle}>
@@ -80,7 +111,7 @@ const Home = () => {
 
       {/* --- ABOUT US SECTION --- */}
       <section id="about-us" style={aboutSection}>
-        <div style={aboutContainer}>
+        <div style={aboutContainer} className="about-reveal">
           <h2 style={aboutHeading}>About SustainEats</h2>
           <p style={aboutSubText}>
             SustainEats is an AI-powered platform designed to bridge the gap between 
@@ -88,18 +119,18 @@ const Home = () => {
           </p>
           
           <div style={missionGrid}>
-            <div style={missionCard} className="premium-card">
-              <div style={missionIcon}>🌱</div>
+            <div style={missionCard} className="mission-card-3d">
+              <div style={missionIcon} className="mission-icon-animate">🌱</div>
               <h3 style={missionTitle}>Eco-Conscious</h3>
               <p style={missionDesc}>We provide a 1-10 Eco-Score based on carbon footprint and water usage for every meal.</p>
             </div>
-            <div style={missionCard} className="premium-card">
-              <div style={missionIcon}>📉</div>
+            <div style={missionCard} className="mission-card-3d">
+              <div style={missionIcon} className="mission-icon-animate">📉</div>
               <h3 style={missionTitle}>Waste Tracker</h3>
               <p style={missionDesc}>Our "Manage Fridge" system suggests recipes based on your existing ingredients to reduce food waste.</p>
             </div>
-            <div style={missionCard} className="premium-card">
-              <div style={missionIcon}>🤖</div>
+            <div style={missionCard} className="mission-card-3d">
+              <div style={missionIcon} className="mission-icon-animate">🤖</div>
               <h3 style={missionTitle}>AI Powered</h3>
               <p style={missionDesc}>Using MongoDB and AI, we personalize meal plans to fit your health goals and eco-values.</p>
             </div>
@@ -180,15 +211,21 @@ const floatingPizza = { position: 'absolute', width: '160px', top: '-30px', righ
 const floatingBiryani = { position: 'absolute', width: '200px', bottom: '-10px', right: '-30px', zIndex: 6 };
 const floatingJuice = { position: 'absolute', width: '130px', bottom: '30px', left: '-50px', zIndex: 6 };
 
-const aboutSection = { padding: '120px 8%', backgroundColor: '#042215' };
-const aboutContainer = { width: '100%', maxWidth: '1300px', margin: '0 auto', textAlign: 'center' };
-const aboutHeading = { fontSize: '60px', fontWeight: '800', color: '#99ff66', marginBottom: '30px' };
-const aboutSubText = { fontSize: '24px', color: '#ddd', maxWidth: '900px', margin: '0 auto 80px auto', lineHeight: '1.7' };
-const missionGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '40px' };
-const missionCard = { padding: '50px', borderRadius: '40px', textAlign: 'left' };
-const missionIcon = { fontSize: '50px', marginBottom: '25px' };
-const missionTitle = { fontSize: '28px', color: 'white', marginBottom: '15px', fontWeight: '700' };
-const missionDesc = { color: '#aaa', lineHeight: '1.6', fontSize: '18px' };
+const aboutSection = { 
+  padding: '150px 8%', 
+  backgroundColor: '#052a1a',
+  background: 'radial-gradient(circle at 70% 30%, rgba(153, 255, 102, 0.05) 0%, rgba(5, 42, 26, 1) 70%)',
+  position: 'relative',
+  overflow: 'hidden'
+};
+const aboutContainer = { width: '100%', maxWidth: '1300px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 2 };
+const aboutHeading = { fontSize: '72px', fontWeight: '900', color: '#99ff66', marginBottom: '40px', letterSpacing: '-2px' };
+const aboutSubText = { fontSize: '26px', color: '#eee', maxWidth: '950px', margin: '0 auto 100px auto', lineHeight: '1.8', fontWeight: '300' };
+const missionGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '50px' };
+const missionCard = { padding: '60px 45px', borderRadius: '50px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '10px' };
+const missionIcon = { fontSize: '60px', marginBottom: '20px' };
+const missionTitle = { fontSize: '32px', color: '#ffcc33', marginBottom: '10px', fontWeight: '800', letterSpacing: '-1px' };
+const missionDesc = { color: '#bbb', lineHeight: '1.7', fontSize: '19px', fontWeight: '400' };
 
 const footerSection = { backgroundColor: '#031a10', padding: '100px 8% 40px 8%', borderTop: '1px solid rgba(153, 255, 102, 0.1)' };
 const footerContainer = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '50px', maxWidth: '1300px', margin: '0 auto' };
