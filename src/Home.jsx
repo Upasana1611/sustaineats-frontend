@@ -15,15 +15,15 @@ const Home = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-  if (userEmail && token) {
-    fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`, {
+    if (userEmail && token) {
+      fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`, {
         headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then((res) => res.json())
-      .then((data) => setRecipes(data.slice(0, 3)))
-      .catch((err) => console.error("Error fetching recipes:", err));
-  }
-}, [userEmail]);
+      })
+        .then((res) => res.json())
+        .then((data) => setRecipes(data.slice(0, 3)))
+        .catch((err) => console.error("Error fetching recipes:", err));
+    }
+  }, [userEmail]);
   const handleLogout = () => {
     localStorage.clear();
     navigate('/');
@@ -68,10 +68,10 @@ const Home = () => {
           <span style={leafIconStyle} className="sustainability-leaf">🌱</span>
           <span style={brandTextStyle} className="brand-logo-text">SUSTAINEATS</span>
         </div>
-        
+
         <div style={navLinks}>
           <Link to="/home" style={activeNavLink}>Home</Link>
-          <a href="#about-us" style={navLink}>About</a> 
+          <a href="#about-us" style={navLink}>About</a>
           <Link to="/recipes" style={navLink}>Recipes</Link>
           <Link to="/shopping-list" style={navLink}>Shopping List</Link>
           <Link to="/profile" style={navLink}>Profile</Link>
@@ -86,16 +86,16 @@ const Home = () => {
           <p style={heroSubHeader}>We are obsessed with</p>
           <h1 style={heroMainHeader}>Healthy<br />Eating<br />Made Easy</h1>
           <p style={heroDescription}>Explore our healthy meal delivery options and reduce your carbon footprint with every bite.</p>
-          
+
           <div style={heroActionRow}>
             <button onClick={() => navigate('/inventory')} style={exploreBtn}>
               Manage Fridge →
             </button>
             <div style={featuredMealBox} className="featured-meal-description">
-                <span style={bulletStyle} className="highlight-bullet">&bull;</span> 
-                <p style={featuredText}>Quick, easy, and delicious 
-                   <span style={mealName} className="meal-name">Grilled chicken rice chickpeas!</span>
-                </p>
+              <span style={bulletStyle} className="highlight-bullet">&bull;</span>
+              <p style={featuredText}>Quick, easy, and delicious
+                <span style={mealName} className="meal-name">Grilled chicken rice chickpeas!</span>
+              </p>
             </div>
           </div>
         </div>
@@ -114,10 +114,10 @@ const Home = () => {
         <div style={aboutContainer} className="about-reveal">
           <h2 style={aboutHeading}>About SustainEats</h2>
           <p style={aboutSubText}>
-            SustainEats is an AI-powered platform designed to bridge the gap between 
+            SustainEats is an AI-powered platform designed to bridge the gap between
             <strong> healthy eating</strong> and <strong>environmental sustainability</strong>.
           </p>
-          
+
           <div style={missionGrid}>
             <div style={missionCard} className="mission-card-3d">
               <div style={missionIcon} className="mission-icon-animate">🌱</div>
@@ -144,7 +144,7 @@ const Home = () => {
           <div style={footerColumn}>
             <div style={footerLogo}>🌱 SUSTAINEATS</div>
             <p style={footerAboutText}>
-              Making sustainable eating effortless through AI-driven meal planning and 
+              Making sustainable eating effortless through AI-driven meal planning and
               real-time food waste tracking.
             </p>
           </div>
@@ -162,13 +162,22 @@ const Home = () => {
           <div style={footerColumn}>
             <h4 style={footerHeading}>Contact Us</h4>
             <ul style={footerList}>
-              <li style={footerInfo}>📍 Mulund College of Commerce, Mumbai</li>
-              <li style={footerInfo}>📧 support@sustaineats.com</li>
-              <li style={footerInfo}>📞 +91 98765 43210</li>
+              <li style={footerInfoItem}>
+                <span style={footerIcon}>📍</span>
+                <span>Airoli, Navi Mumbai</span>
+              </li>
+              <li style={footerInfoItem}>
+                <span style={footerIcon}>📧</span>
+                <a href="mailto:support@sustaineats.com" style={footerInfoLink}>support@sustaineats.com</a>
+              </li>
+              <li style={footerInfoItem}>
+                <span style={footerIcon}>📞</span>
+                <a href="tel:+919004567321" style={footerInfoLink}>+91 90045 67321</a>
+              </li>
             </ul>
           </div>
         </div>
-        
+
         <div style={footerBottom}>
           <p>© 2026 SustainEats Project | Developed by Upasana Solanki</p>
         </div>
@@ -211,8 +220,8 @@ const floatingPizza = { position: 'absolute', width: '160px', top: '-30px', righ
 const floatingBiryani = { position: 'absolute', width: '200px', bottom: '-10px', right: '-30px', zIndex: 6 };
 const floatingJuice = { position: 'absolute', width: '130px', bottom: '30px', left: '-50px', zIndex: 6 };
 
-const aboutSection = { 
-  padding: '150px 8%', 
+const aboutSection = {
+  padding: '150px 8%',
   backgroundColor: '#052a1a',
   background: 'radial-gradient(circle at 70% 30%, rgba(153, 255, 102, 0.05) 0%, rgba(5, 42, 26, 1) 70%)',
   position: 'relative',
@@ -233,9 +242,30 @@ const footerColumn = { display: 'flex', flexDirection: 'column', gap: '20px' };
 const footerLogo = { fontSize: '24px', fontWeight: 'bold', color: '#ffcc33', display: 'flex', alignItems: 'center', gap: '10px' };
 const footerAboutText = { color: '#aaa', fontSize: '16px', lineHeight: '1.8', maxWidth: '300px' };
 const footerHeading = { fontSize: '22px', fontWeight: 'bold', color: 'white', marginBottom: '15px' };
-const footerList = { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' };
-const footerLink = { color: '#aaa', textDecoration: 'none', fontSize: '18px' };
-const footerInfo = { color: '#aaa', fontSize: '18px', lineHeight: '1.8' };
+const footerList = { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '15px' };
+const footerLink = { color: '#aaa', textDecoration: 'none', fontSize: '18px', transition: 'all 0.3s ease' };
+
+const footerInfoItem = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '15px',
+  color: '#aaa',
+  fontSize: '18px',
+  lineHeight: '1.8',
+  transition: 'transform 0.3s ease'
+};
+
+const footerIcon = {
+  fontSize: '22px',
+  filter: 'drop-shadow(0 0 5px rgba(255,204,51,0.2))'
+};
+
+const footerInfoLink = {
+  color: 'inherit',
+  textDecoration: 'none',
+  transition: 'color 0.3s ease'
+};
+
 const footerBottom = { marginTop: '80px', paddingTop: '30px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', textAlign: 'center', color: '#555', fontSize: '14px' };
 
 export default Home;
