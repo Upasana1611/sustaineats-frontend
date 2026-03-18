@@ -116,21 +116,33 @@ h1, h2, h3 {
   text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(0, 255, 136, 0.4); }
+  100% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.1); }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Summary Cards (Glowing Glassmorphism) */
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 25px;
   margin-bottom: 40px;
+  animation: slideUpFade 0.6s ease-out forwards;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(10, 30, 20, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 25px;
   border-radius: 16px;
-  border: 1px solid rgba(0, 255, 136, 0.15);
+  border: 1px solid rgba(0, 255, 136, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -138,6 +150,7 @@ h1, h2, h3 {
   position: relative;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
+  animation: pulseGlow 4s infinite alternate;
 }
 
 .card::before {
@@ -145,30 +158,33 @@ h1, h2, h3 {
   position: absolute;
   top: -50px; left: -50px;
   width: 100px; height: 100px;
-  background: radial-gradient(circle, rgba(0, 255, 136, 0.4) 0%, transparent 70%);
-  opacity: 0.5;
-  filter: blur(20px);
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.5) 0%, transparent 70%);
+  opacity: 0.6;
+  filter: blur(25px);
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 255, 136, 0.15);
-  border-color: rgba(0, 255, 136, 0.4);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3);
+  border-color: rgba(0, 255, 136, 0.6);
 }
 
 .card h3 {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #a8d5ba;
   margin-bottom: 15px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  z-index: 1;
 }
 
 .card p {
-  font-size: 3rem;
+  font-size: 3.5rem;
+  font-weight: 800;
   color: #00ff88;
   margin: 0;
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  text-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+  z-index: 1;
 }
 
 /* Sections */
@@ -193,38 +209,105 @@ h1, h2, h3 {
 /* Table Design */
 .admin-table-container {
   overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 }
 
 .admin-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .admin-table th, .admin-table td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 20px 16px;
+  border-bottom: 1px solid rgba(0, 255, 136, 0.15);
   text-align: left;
 }
 
 .admin-table th {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(4, 30, 16, 0.8);
   color: #00ff88;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(10px);
 }
 
 .admin-table tr {
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.01);
 }
 
 .admin-table tr:hover {
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: rgba(0, 255, 136, 0.08);
+  transform: scale(1.005);
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
 }
 
 .admin-table td {
   color: #e2f5ea;
+  vertical-align: middle;
+}
+
+/* User & Avatar Styling for Visibility */
+.user-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #00ff88 !important; /* Forces neon green */
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+  letter-spacing: 0.5px;
+}
+
+.user-avatar {
+  min-width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00ff88, #009955);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #010f08;
+  font-weight: 800;
+  font-size: 1.3rem;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  text-shadow: none;
+}
+
+.waste-avatar {
+  background: linear-gradient(135deg, #ff4d4d, #990000);
+  box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+  color: white;
+}
+
+.user-email-cell {
+  color: #a8d5ba;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.waste-item-cell {
+  font-weight: 600;
+  color: #ffb84d;
+  font-size: 1.05rem;
+  text-transform: capitalize;
+}
+
+.qty-badge {
+  background: rgba(255, 184, 77, 0.2);
+  color: #ffb84d;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  border: 1px solid rgba(255, 184, 77, 0.5);
 }
 
 /* Fallbacks & States */

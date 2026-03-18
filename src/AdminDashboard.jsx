@@ -174,7 +174,7 @@ const AdminDashboard = () => {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>User</th>
               <th>Email</th>
               <th>Action</th>
             </tr>
@@ -182,8 +182,13 @@ const AdminDashboard = () => {
           <tbody>
             {userList.map((u, i) => (
               <tr key={u.email || i}>
-                <td>{u.name || "Unknown"}</td>
-                <td>{u.email}</td>
+                <td className="user-name-cell">
+                  <div className="user-avatar">
+                   {(u.name && u.name.length > 0) ? u.name[0].toUpperCase() : "U"}
+                  </div>
+                  <span>{u.name || "Unknown"}</span>
+                </td>
+                <td className="user-email-cell">{u.email}</td>
                 <td>
                   <button 
                     className="delete-btn"
@@ -210,7 +215,7 @@ const AdminDashboard = () => {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>User Email</th>
+              <th>User</th>
               <th>Spoiled Item</th>
               <th>Qty</th>
               <th>Date Marked Waste</th>
@@ -219,9 +224,16 @@ const AdminDashboard = () => {
           <tbody>
             {wasteList.map((w, i) => (
               <tr key={w._id?.$oid || i}>
-                <td>{w.email || "Unknown"}</td>
-                <td>{w.item_name || "Unknown Item"}</td>
-                <td>{w.quantity || 1}</td>
+                <td className="user-name-cell">
+                  <div className="user-avatar waste-avatar">
+                   {(w.email && w.email.length > 0) ? w.email[0].toUpperCase() : "?"}
+                  </div>
+                  <span className="user-email-cell">{w.email || "Unknown"}</span>
+                </td>
+                <td className="waste-item-cell">{w.item_name || "Unknown Item"}</td>
+                <td>
+                  <span className="qty-badge">{w.quantity || 1}</span>
+                </td>
                 <td>{w.waste_date || "Unknown Date"}</td>
               </tr>
             ))}
