@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   // Report Generation State
   const [showReport, setShowReport] = useState(false);
   const [reportData, setReportData] = useState(null);
+  const [userReports, setUserReports] = useState([]);
 
   // Authentication Check
   useEffect(() => {
@@ -79,54 +80,113 @@ const AdminDashboard = () => {
   };
 
   const generateReport = () => {
-    // Analytics calculations based on user requirements
-    // 1. Total Waste
     const totalWasteLogs = wasteReports.length;
-    
-    // 2. Financial & Environmental Impact Estimations
-    // Assume average $3.50 lost per wasted item and 2.5kg CO2
-    const totalCostLost = (totalWasteLogs * 3.50).toFixed(2);
-    const co2Emissions = (totalWasteLogs * 2.5).toFixed(1);
+    let totalCostLost = 0;
+    let totalCo2 = 0;
 
-    // 3. Most wasted items
-    const itemCounts = {};
+    const globalItems = {};
+    const userStats = {};
+
+    // Aggregate Data
     wasteReports.forEach(w => {
+      const email = w.email || "Unknown";
       const name = w.item_name || "Unknown";
-      itemCounts[name] = (itemCounts[name] || 0) + (parseInt(w.quantity) || 1);
+      const qty = parseInt(w.quantity) || 1;
+
+      // Global Totals
+      totalCostLost += qty * 3.50;
+      totalCo2 += qty * 2.5;
+      globalItems[name] = (globalItems[name] || 0) + qty;
+
+      // Per-User Totals
+      if (!userStats[email]) {
+        userStats[email] = { email, totalWasted: 0, costLost: 0, co2: 0, items: {} };
+      }
+      userStats[email].totalWasted += qty;
+      userStats[email].costLost += qty * 3.50;
+      userStats[email].co2 += qty * 2.5;
+      userStats[email].items[name] = (userStats[email].items[name] || 0) + qty;
     });
 
-    let mostWasted = "N/A";
-    let max = 0;
-    for (let item in itemCounts) {
-      if (itemCounts[item] > max) {
-        max = itemCounts[item];
-        mostWasted = item;
+    // Global Insights Calculation
+    let mostWastedGlobal = "N/A";
+    let maxGlobal = 0;
+    for (let item in globalItems) {
+      if (globalItems[item] > maxGlobal) {
+        maxGlobal = globalItems[item];
+        mostWastedGlobal = item;
       }
     }
 
-    // 4. Worst Offenders (Users who waste the most)
-    const userWastes = {};
-    wasteReports.forEach(w => {
-      userWastes[w.email] = (userWastes[w.email] || 0) + 1;
-    });
     let topOffender = "N/A";
     let offMax = 0;
-    for (let u in userWastes) {
-      if (userWastes[u] > offMax) {
-        offMax = userWastes[u];
-        topOffender = u;
-      }
-    }
+    const userReportArray = Object.values(userStats).map(user => {
+       if (user.totalWasted > offMax) {
+         offMax = user.totalWasted;
+         topOffender = user.email;
+       }
+       
+       let mostWastedUser = "N/A";
+       let maxU = 0;
+       for (let item in user.items) {
+          if (user.items[item] > maxU) {
+             maxU = user.items[item];
+             mostWastedUser = item;
+          }
+       }
+       return {
+          email: user.email,
+          totalWasted: user.totalWasted,
+          costLost: `$${user.costLost.toFixed(2)}`,
+          co2: `${user.co2.toFixed(1)} kg`,
+          mostWasted: mostWastedUser
+       };
+    });
+
+    setUserReports(userReportArray.sort((a,b) => b.totalWasted - a.totalWasted));
 
     setReportData({
       totalLogs: totalWasteLogs,
-      costLost: `$${totalCostLost}`,
-      emissions: `${co2Emissions} kg`,
-      mostWasted: mostWasted,
-      topOffender: topOffender
+      costLost: `$${totalCostLost.toFixed(2)}`,
+      emissions: `${totalCo2.toFixed(1)} kg`,
+      mostWasted: mostWastedGlobal,
+      topOffender: topOffender || "N/A"
     });
     
     setShowReport(true);
+  };
+
+  const downloadCSV = () => {
+    if (!userReports || userReports.length === 0) {
+      alert("Please generate the report first!");
+      return;
+    }
+    
+    // Headers mapped to friendly names
+    const headers = ["User Email", "Total Items Wasted", "Financial Loss ($)", "CO2 Footprint (kg)", "Most Wasted Food"];
+    
+    // Map rows replacing symbols to keep CSV clean
+    const rows = userReports.map(u => [
+       u.email, 
+       u.totalWasted, 
+       u.costLost.replace('$', ''), 
+       u.co2.replace(' kg', ''), 
+       u.mostWasted
+    ]);
+    
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(e => e.join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Sustainability_User_Report_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleLogout = () => {
@@ -274,6 +334,42 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {showReport && userReports.length > 0 && (
+          <div className="admin-section" style={{ borderLeft: '4px solid #0088ff' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h3 style={{ margin: 0, color: '#e2f5ea' }}>Per-User Sustainability Breakdown</h3>
+                <button className="generate-report-btn" onClick={downloadCSV} style={{background: 'linear-gradient(135deg, #0088ff, #0055ff)', fontSize: '0.9rem', padding: '10px 18px'}}>
+                  ⬇️ Download CSV
+                </button>
+             </div>
+             <div className="admin-table-container">
+               <table className="admin-table">
+                 <thead>
+                   <tr>
+                     <th>User Email</th>
+                     <th>Total Wasted</th>
+                     <th>Loss Est.</th>
+                     <th>CO₂ Est.</th>
+                     <th>Biggest Waste Habit</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {userReports.map((u, i) => (
+                     <tr key={i}>
+                       <td className="user-email-cell">{u.email}</td>
+                       <td><span className="qty-badge" style={{background: 'transparent', border: '1px solid #00ff88', color: '#00ff88'}}>{u.totalWasted}</span></td>
+                       <td style={{color: '#ff6b6b', fontWeight: 'bold'}}>{u.costLost}</td>
+                       <td style={{color: '#ff6b6b', fontWeight: 'bold'}}>{u.co2}</td>
+                       <td className="waste-item-cell" style={{color: '#a8d5ba'}}>{u.mostWasted}</td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div>
+          </div>
+        )}
+
+        <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#a8d5ba' }}>Raw Waste Logs Database</h3>
         {renderWasteTable(wasteReports)}
       </div>
     );
