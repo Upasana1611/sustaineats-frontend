@@ -87,6 +87,17 @@ const AdminDashboard = () => {
     const globalItems = {};
     const userStats = {};
 
+    // Initialize all registered users in the stats
+    users.forEach(u => {
+      userStats[u.email] = { 
+        email: u.email, 
+        totalWasted: 0, 
+        costLost: 0, 
+        co2: 0, 
+        items: {} 
+      };
+    });
+
     // Aggregate Data
     wasteReports.forEach(w => {
       const email = w.email || "Unknown";
@@ -98,7 +109,7 @@ const AdminDashboard = () => {
       totalCo2 += qty * 2.5;
       globalItems[name] = (globalItems[name] || 0) + qty;
 
-      // Per-User Totals
+      // Per-User Totals (Update if user already in stats, or add if legacy/unknown)
       if (!userStats[email]) {
         userStats[email] = { email, totalWasted: 0, costLost: 0, co2: 0, items: {} };
       }
