@@ -11,6 +11,11 @@ const Recipes = () => {
   const userEmail = localStorage.getItem("email") || localStorage.getItem("userEmail");
   const token = localStorage.getItem("token");
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
+
   const handleGenerateAIRecipe = async () => {
     if (!userEmail || !token) {
         alert("Please log in to use the AI Recipe Generator.");
@@ -484,6 +489,23 @@ const Recipes = () => {
         `}
       </style>
 
+      {/* --- ATTRACTIVE NAVBAR WITH LOGOUT --- */}
+      <nav style={navbarStyle}>
+        <div style={logoStyle}>
+          <span style={leafIconStyle} className="sustainability-leaf">🌱</span>
+          <span style={brandTextStyle} className="brand-logo-text">SUSTAINEATS</span>
+        </div>
+        
+        <div style={navLinks}>
+          <Link to="/home" style={navLink}>Home</Link>
+          <Link to="/recipes" style={activeNavLink}>Recipes</Link>
+          <Link to="/shopping-list" style={navLink}>Shopping List</Link>
+          <Link to="/profile" style={navLink}>Profile</Link>
+          <Link to="/feedback" style={navLink}>Feedback</Link>
+          <button onClick={handleLogout} style={logoutBtnStyle}>Logout</button>
+        </div>
+      </nav>
+
       {/* Navigation Header */}
       <div style={headerStyle}>
         <h1 style={titleStyle}>Gourmet Kitchen</h1>
@@ -615,6 +637,39 @@ const containerStyle = {
   color: '#fff',
   fontFamily: "'Inter', sans-serif",
   paddingBottom: '50px'
+};
+
+const navbarStyle = { 
+  display: 'flex', 
+  justifyContent: 'space-between', 
+  padding: '30px 8%', 
+  alignItems: 'center',
+  backgroundColor: 'rgba(5, 42, 26, 0.8)',
+  backdropFilter: 'blur(10px)',
+  position: 'sticky',
+  top: 0,
+  zIndex: 100
+};
+
+const logoStyle = { display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' };
+const leafIconStyle = { fontSize: '32px' };
+const brandTextStyle = { fontSize: '28px', fontWeight: '800', letterSpacing: '2px', color: '#99ff66', textTransform: 'uppercase' };
+
+const navLinks = { display: 'flex', gap: '30px', alignItems: 'center' };
+const navLink = { color: '#a0a0a0', textDecoration: 'none', fontSize: '18px', transition: 'color 0.3s' };
+const activeNavLink = { color: '#ffcc33', textDecoration: 'none', fontWeight: 'bold', borderBottom: '2px solid #ffcc33', fontSize: '18px' };
+
+const logoutBtnStyle = { 
+  backgroundColor: 'transparent', 
+  color: '#ff6666', 
+  border: '2px solid #ff6666', 
+  padding: '8px 20px', 
+  borderRadius: '50px', 
+  fontSize: '16px', 
+  fontWeight: 'bold', 
+  cursor: 'pointer', 
+  transition: 'all 0.3s', 
+  marginLeft: '10px' 
 };
 
 const headerStyle = {
