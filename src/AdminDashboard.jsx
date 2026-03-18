@@ -89,8 +89,9 @@ const AdminDashboard = () => {
 
     // Initialize all registered users in the stats
     users.forEach(u => {
-      userStats[u.email] = { 
-        email: u.email, 
+      const email = u.email ? u.email.toLowerCase().trim() : "Unknown";
+      userStats[email] = { 
+        email: email, 
         totalWasted: 0, 
         costLost: 0, 
         co2: 0, 
@@ -100,7 +101,7 @@ const AdminDashboard = () => {
 
     // Aggregate Data
     wasteReports.forEach(w => {
-      const email = w.email || "Unknown";
+      const email = w.email ? w.email.toLowerCase().trim() : "Unknown";
       const name = w.item_name || "Unknown";
       const qty = parseInt(w.quantity) || 1;
 
