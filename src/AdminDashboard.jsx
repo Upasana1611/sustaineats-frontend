@@ -106,7 +106,7 @@ const AdminDashboard = () => {
       const qty = parseInt(w.quantity) || 1;
 
       // Global Totals
-      totalCostLost += qty * 3.50;
+      totalCostLost += qty * 250;
       totalCo2 += qty * 2.5;
       globalItems[name] = (globalItems[name] || 0) + qty;
 
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
         userStats[email] = { email, totalWasted: 0, costLost: 0, co2: 0, items: {} };
       }
       userStats[email].totalWasted += qty;
-      userStats[email].costLost += qty * 3.50;
+      userStats[email].costLost += qty * 250;
       userStats[email].co2 += qty * 2.5;
       userStats[email].items[name] = (userStats[email].items[name] || 0) + qty;
     });
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
        return {
           email: user.email,
           totalWasted: user.totalWasted,
-          costLost: `$${user.costLost.toFixed(2)}`,
+          costLost: `₹${user.costLost.toFixed(2)}`,
           co2: `${user.co2.toFixed(1)} kg`,
           mostWasted: mostWastedUser
        };
@@ -159,7 +159,7 @@ const AdminDashboard = () => {
 
     setReportData({
       totalLogs: totalWasteLogs,
-      costLost: `$${totalCostLost.toFixed(2)}`,
+      costLost: `₹${totalCostLost.toFixed(2)}`,
       emissions: `${totalCo2.toFixed(1)} kg`,
       mostWasted: mostWastedGlobal,
       topOffender: topOffender || "N/A"
@@ -175,13 +175,13 @@ const AdminDashboard = () => {
     }
     
     // Headers mapped to friendly names
-    const headers = ["User Email", "Total Items Wasted", "Financial Loss ($)", "CO2 Footprint (kg)", "Most Wasted Food"];
+    const headers = ["User Email", "Total Items Wasted", "Financial Loss (₹)", "CO2 Footprint (kg)", "Most Wasted Food"];
     
     // Map rows replacing symbols to keep CSV clean
     const rows = userReports.map(u => [
        u.email, 
        u.totalWasted, 
-       u.costLost.replace('$', ''), 
+       u.costLost.replace('₹', ''), 
        u.co2.replace(' kg', ''), 
        u.mostWasted
     ]);
