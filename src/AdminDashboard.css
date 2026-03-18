@@ -239,18 +239,19 @@ h1, h2, h3 {
 
 .admin-table tr {
   transition: all 0.3s ease;
-  background-color: rgba(255, 255, 255, 0.01);
+  background-color: rgba(10, 30, 20, 0.6) !important;
 }
 
 .admin-table tr:hover {
-  background-color: rgba(0, 255, 136, 0.08);
+  background-color: rgba(0, 255, 136, 0.15) !important;
   transform: scale(1.005);
   box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
 }
 
 .admin-table td {
-  color: #e2f5ea;
+  color: #e2f5ea !important;
   vertical-align: middle;
+  background-color: transparent !important;
 }
 
 /* User & Avatar Styling for Visibility */
@@ -288,7 +289,7 @@ h1, h2, h3 {
 }
 
 .user-email-cell {
-  color: #a8d5ba;
+  color: #a8d5ba !important;
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.95rem;
   opacity: 0.9;
