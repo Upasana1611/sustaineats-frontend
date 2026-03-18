@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API_BASE_URL from './config';
+import aiChefImg from './assets/ai-chef.png';
 
 const Recipes = () => {
   const navigate = useNavigate();
@@ -450,161 +451,320 @@ const Recipes = () => {
     r.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // --- 1. DETAIL VIEW (Updated Layout) ---
-  if (selectedRecipe) {
-    return (
-      <div style={pageContainer}>
-        <div style={detailHeader}>
-          <button onClick={() => setSelectedRecipe(null)} style={backBtn}>← Back to Recipes</button>
-        </div>
-        <div style={recipeDetailCard}>
-          <div style={detailHero}>
-            <div style={{...dishCircle, width: '160px', height: '160px', margin: '0 auto 20px auto', boxShadow: '0 8px 25px rgba(0,0,0,0.1)'}}>
-              <img src={selectedRecipe.img} alt={selectedRecipe.name} style={imageFitStyle} />
-            </div>
-            <h1 style={{color: '#052a1a', fontSize: '32px'}}>{selectedRecipe.name}</h1>
-            <div style={detailStats}>
-              <span>⏱️ {selectedRecipe.time}</span>
-              <span>👥 Serves {selectedRecipe.servings}</span>
-              <span>🔥 {selectedRecipe.calories} kCal</span>
-            </div>
-          </div>
-
-          {/* This grid wrapper fills the empty space by creating two columns */}
-          <div style={twoColumnContent}>
-            <div style={section}>
-              <h3 style={sectionTitle}>Ingredients</h3>
-              <ul style={listStyle}>
-                {selectedRecipe.ingredients.map((ing, i) => <li key={i} style={listItem}>• {ing}</li>)}
-              </ul>
-            </div>
-            
-            <div style={section}>
-              <h3 style={sectionTitle}>Cooking Steps</h3>
-              <ol style={listStyle}>
-                {selectedRecipe.steps.map((step, i) => (
-                  <li key={i} style={{...listItem, marginBottom: '20px'}}>
-                    <strong style={{color: '#7ec335', display: 'block'}}>Step {i+1}</strong> 
-                    {step}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // --- 2. MAIN GRID VIEW ---
   return (
-    <div style={pageContainer}>
-      <nav style={navbarStyle}>
-        <div style={logoStyle}> SustainEats</div>
-        <div style={navLinks}>
-          <Link to="/home" style={navLink}>Home</Link>
-          <Link to="/recipes" style={activeNavLink}>Recipes</Link>
-          <Link to="/profile" style={navLink}>Profile</Link>
-        </div>
-      </nav>
-      <header style={headerSection}>
-        <h1 style={titleStyle}>The Recipe Book</h1>
+    <div style={containerStyle}>
+      {/* Dynamic Keyframes Injection */}
+      <style>
+        {`
+          @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(153, 255, 102, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(153, 255, 102, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(153, 255, 102, 0.4); }
+          }
+          .ai-avatar {
+            animation: pulseGlow 3s infinite ease-in-out;
+            border: 4px solid #99ff66;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+          }
+          .glass-modal {
+            background: rgba(5, 42, 26, 0.9) !important;
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(153, 255, 102, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+          }
+          .recipe-card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(153, 255, 102, 0.1);
+          }
+        `}
+      </style>
+
+      {/* Navigation Header */}
+      <div style={headerStyle}>
+        <h1 style={titleStyle}>Gourmet Kitchen</h1>
+        <p style={subtitleStyle}>Sustainable eating, powered by AI intelligence.</p>
+      </div>
+
+      <div style={searchActionsStyle}>
         <div style={searchWrapper}>
           <input 
             type="text" 
-            placeholder="Search 50+ Beef-Free Recipes..." 
-            style={searchInput}
+            placeholder="Search our sustainable collection..." 
+            style={searchInputStyle}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <button 
-            onClick={handleGenerateAIRecipe} 
-            style={aiButtonStyle}
-            disabled={isGenerating}
+          onClick={handleGenerateAIRecipe} 
+          style={aiButtonStyle}
+          disabled={isGenerating}
         >
-            {isGenerating ? "🤖 AI is thinking..." : "🪄 Ask AI for Custom Recipe (from Fridge)"}
+          {isGenerating ? "🍳 Chef is cooking..." : "✨ AI Recipe Generator ✨"}
         </button>
-      </header>
-      <div style={recipeGrid}>
+      </div>
+
+      <div style={recipeGridStyle}>
         {filteredRecipes.map((recipe) => (
-          <div key={recipe.id} style={recipeCard} onClick={() => setSelectedRecipe(recipe)}>
-            <div style={cardTextSide}>
-              <h3 style={recipeName}>{recipe.name}</h3>
-              <div style={statsRow}>
-                <span>⏱️ {recipe.time}</span>
-                <span>👥 {recipe.servings} People</span>
-              </div>
+          <div 
+            key={recipe.id} 
+            style={recipeCardStyle} 
+            className="recipe-card-hover"
+            onClick={() => setSelectedRecipe(recipe)}
+          >
+            <div style={imageContainerStyle}>
+              <img src={recipe.img} alt={recipe.name} style={recipeImageStyle} />
+              <div style={typeBadgeStyle}>{recipe.type}</div>
             </div>
-            <div style={imageSide}>
-              <div style={dishCircle}>
-                <img 
-  src={recipe.img || `/recipe-images/${recipe.id}.jpg`} 
-  alt={recipe.name} 
-  style={imageFitStyle} 
-/> 
+            <div style={recipeInfoStyle}>
+              <h3 style={recipeNameStyle}>{recipe.name}</h3>
+              <div style={recipeMetaStyle}>
+                <span>⏱️ {recipe.time}</span>
+                <span>👤 {recipe.servings} Servings</span>
               </div>
-              <div style={arrowBtn}>↗</div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* MODAL OVERLAY */}
+      {selectedRecipe && (
+        <div style={modalOverlay} onClick={() => setSelectedRecipe(null)}>
+          <div 
+            style={{
+              ...modalContent,
+              ...(selectedRecipe.id === 'ai-generated' ? glassModalStyle : {})
+            }} 
+            className={selectedRecipe.id === 'ai-generated' ? "glass-modal" : ""}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button style={closeButtonStyle} onClick={() => setSelectedRecipe(null)}>×</button>
+            
+            <div style={modalScrollArea}>
+              {selectedRecipe.id === 'ai-generated' ? (
+                <div style={aiChefHeaderStyle}>
+                  <img 
+                    src={aiChefImg} 
+                    alt="AI Chef" 
+                    className="ai-avatar"
+                  />
+                  <h2 style={aiTitleStyle}>{selectedRecipe.name}</h2>
+                  <p style={aiSubtitleStyle}>Crafted specifically for your inventory</p>
+                </div>
+              ) : (
+                <img src={selectedRecipe.img} alt={selectedRecipe.name} style={detailImageStyle} />
+              )}
+
+              <div style={detailContentStyle}>
+                {selectedRecipe.id !== 'ai-generated' && (
+                  <h2 style={detailTitleStyle}>{selectedRecipe.name}</h2>
+                )}
+                
+                <div style={detailMetaRow}>
+                  <div style={metaItemStyle}><strong>Time:</strong> {selectedRecipe.time}</div>
+                  <div style={metaItemStyle}><strong>Servings:</strong> {selectedRecipe.servings}</div>
+                  <div style={metaItemStyle}><strong>Calories:</strong> {selectedRecipe.calories} kcal</div>
+                </div>
+
+                <div style={sectionDivider} />
+
+                <div style={ingredientsSection}>
+                  <h3 style={sectionHeadingStyle}>Ingredients</h3>
+                  <ul style={listStyle}>
+                    {selectedRecipe.ingredients.map((ing, i) => (
+                      <li key={i} style={listItemStyle}>• {ing}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div style={instructionsSection}>
+                  <h3 style={sectionHeadingStyle}>Cooking Instructions</h3>
+                  <ol style={numberedListStyle}>
+                    {selectedRecipe.steps.map((step, i) => (
+                      <li key={i} style={stepItemStyle}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+                
+                <button 
+                  style={bookButtonStyle}
+                  onClick={() => {
+                    alert(`${selectedRecipe.name} saved to your cookbook!`);
+                    setSelectedRecipe(null);
+                  }}
+                >
+                  Save to My Cookbook
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-// --- UPDATED STYLES ---
-
-const imageFitStyle = { width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' };
-const pageContainer = { backgroundColor: '#052a1a', minHeight: '100vh', color: 'white', fontFamily: 'Poppins, sans-serif' };
-const navbarStyle = { display: 'flex', justifyContent: 'space-between', padding: '30px 8%', alignItems: 'center' };
-const logoStyle = { fontSize: '24px', fontWeight: '800' };
-const navLinks = { display: 'flex', gap: '40px' };
-const navLink = { color: '#a0a0a0', textDecoration: 'none' };
-const activeNavLink = { color: '#ffcc33', textDecoration: 'none', fontWeight: 'bold' };
-const headerSection = { textAlign: 'center', padding: '20px 8%' };
-const titleStyle = { fontSize: '42px', fontWeight: '800' };
-const searchWrapper = { display: 'flex', justifyContent: 'center', marginBottom: '40px' };
-const searchInput = { width: '400px', padding: '15px 25px', borderRadius: '50px', border: 'none', outline: 'none' };
-const recipeGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '30px', padding: '0 8% 100px 8%' };
-const recipeCard = { backgroundColor: 'white', borderRadius: '35px', padding: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#333', cursor: 'pointer' };
-const cardTextSide = { flex: 1 };
-const recipeName = { margin: '0 0 10px 0', fontSize: '19px', fontWeight: 'bold', color: '#052a1a' };
-const statsRow = { display: 'flex', gap: '15px', fontSize: '12px', color: '#2d7a2d', fontWeight: 'bold' };
-const imageSide = { position: 'relative' };
-const dishCircle = { width: '100px', height: '100px', backgroundColor: '#f9f9f9', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' };
-const arrowBtn = { position: 'absolute', bottom: '0', left: '0', backgroundColor: '#7ec335', color: 'white', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' };
-const detailHeader = { padding: '40px 8% 20px 8%' };
-const backBtn = { background: 'none', border: '1px solid #ffcc33', color: '#ffcc33', padding: '10px 20px', borderRadius: '50px', cursor: 'pointer' };
-const recipeDetailCard = { backgroundColor: 'white', color: '#333', margin: '0 8% 100px 8%', borderRadius: '40px', overflow: 'hidden' };
-const detailHero = { textAlign: 'center', padding: '40px', borderBottom: '1px solid #eee' };
-const detailStats = { display: 'flex', justifyContent: 'center', gap: '30px', marginTop: '20px', color: '#666' };
-
-// NEW: Use CSS Grid to fill the empty space
-const twoColumnContent = { 
-  padding: '40px', 
-  display: 'grid', 
-  gridTemplateColumns: '1fr 2fr', // Left column is 1 part, right column is 2 parts
-  gap: '40px' 
+// --- STYLES ---
+const containerStyle = {
+  backgroundColor: '#052a1a',
+  minHeight: '100vh',
+  color: '#fff',
+  fontFamily: "'Inter', sans-serif",
+  paddingBottom: '50px'
 };
 
-const sectionTitle = { color: '#052a1a', fontSize: '24px', marginBottom: '20px', borderBottom: '3px solid #ffcc33', display: 'inline-block' };
-const listStyle = { listStyle: 'none', padding: 0 };
-const listItem = { fontSize: '16px', marginBottom: '10px', lineHeight: '1.6' };
-const section = { padding: '0 10px' };
+const headerStyle = {
+  padding: '60px 20px',
+  textAlign: 'center',
+  background: 'linear-gradient(180deg, rgba(153, 255, 102, 0.1) 0%, rgba(5, 42, 26, 0) 100%)'
+};
+
+const titleStyle = { fontSize: '3rem', fontWeight: '800', marginBottom: '10px', color: '#99ff66' };
+const subtitleStyle = { fontSize: '1.2rem', opacity: 0.8 };
+
+const searchActionsStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '20px',
+  marginBottom: '60px'
+};
+
+const searchWrapper = { width: '100%', maxWidth: '600px', padding: '0 20px' };
+const searchInputStyle = {
+  width: '100%',
+  padding: '18px 30px',
+  borderRadius: '50px',
+  border: 'none',
+  backgroundColor: 'rgba(255,255,255,0.1)',
+  color: '#fff',
+  fontSize: '1rem',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255,255,255,0.2)',
+  outline: 'none'
+};
 
 const aiButtonStyle = {
   backgroundColor: '#99ff66',
   color: '#052a1a',
-  padding: '15px 30px',
+  padding: '18px 40px',
   borderRadius: '50px',
   border: 'none',
   fontWeight: 'bold',
-  fontSize: '16px',
+  fontSize: '1.1rem',
   cursor: 'pointer',
-  boxShadow: '0 4px 15px rgba(153, 255, 102, 0.3)',
   transition: 'all 0.3s ease',
-  marginTop: '10px',
-  marginBottom: '30px'
+  boxShadow: '0 10px 20px rgba(153, 255, 102, 0.3)'
 };
 
-export default Recipes;
+const recipeGridStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+  gap: '30px',
+  padding: '0 5%',
+  maxWidth: '1400px',
+  margin: '0 auto'
+};
+
+const recipeCardStyle = {
+  backgroundColor: 'rgba(255,255,255,0.05)',
+  borderRadius: '24px',
+  overflow: 'hidden',
+  cursor: 'pointer',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  border: '1px solid rgba(255,255,255,0.1)'
+};
+
+const imageContainerStyle = { position: 'relative', height: '220px' };
+const recipeImageStyle = { width: '100%', height: '100%', objectFit: 'cover' };
+const typeBadgeStyle = {
+  position: 'absolute',
+  top: '15px',
+  right: '15px',
+  backgroundColor: '#99ff66',
+  color: '#052a1a',
+  padding: '6px 14px',
+  borderRadius: '20px',
+  fontSize: '0.85rem',
+  fontWeight: 'bold',
+  boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
+};
+
+const recipeInfoStyle = { padding: '24px' };
+const recipeNameStyle = { fontSize: '1.4rem', fontWeight: '700', marginBottom: '12px', color: '#fff' };
+const recipeMetaStyle = { display: 'flex', gap: '20px', fontSize: '0.95rem', opacity: 0.8 };
+
+const modalOverlay = {
+  position: 'fixed',
+  top: 0, left: 0, right: 0, bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.9)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 1000,
+  backdropFilter: 'blur(5px)'
+};
+
+const modalContent = {
+  backgroundColor: '#fff',
+  color: '#052a1a',
+  width: '90%',
+  maxWidth: '850px',
+  maxHeight: '90vh',
+  borderRadius: '40px',
+  position: 'relative',
+  overflow: 'hidden',
+  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+};
+
+const glassModalStyle = { color: '#fff' };
+const modalScrollArea = { padding: '50px', overflowY: 'auto', maxHeight: '90vh' };
+const closeButtonStyle = {
+  position: 'absolute',
+  top: '25px', right: '25px',
+  fontSize: '2.5rem',
+  background: 'none',
+  border: 'none',
+  color: 'inherit',
+  cursor: 'pointer',
+  zIndex: 10,
+  lineHeight: 1
+};
+
+const aiChefHeaderStyle = { textAlign: 'center', marginBottom: '40px' };
+const aiTitleStyle = { fontSize: '2.8rem', fontWeight: '900', color: '#99ff66', marginBottom: '10px' };
+const aiSubtitleStyle = { fontSize: '1.2rem', opacity: 0.9, fontStyle: 'italic', letterSpacing: '0.5px' };
+
+const detailImageStyle = { width: '100%', height: '350px', objectFit: 'cover', borderRadius: '25px', marginBottom: '35px' };
+const detailTitleStyle = { fontSize: '2.5rem', fontWeight: '800', marginBottom: '25px', color: '#052a1a' };
+const detailContentStyle = { textAlign: 'left' };
+const detailMetaRow = { display: 'flex', gap: '35px', marginBottom: '35px', opacity: 0.9 };
+const metaItemStyle = { fontSize: '1.1rem' };
+const sectionDivider = { height: '1px', backgroundColor: 'rgba(0,0,0,0.1)', marginBottom: '35px' };
+const sectionHeadingStyle = { fontSize: '1.8rem', fontWeight: '700', marginBottom: '25px', color: 'inherit' };
+const listStyle = { listStyle: 'none', padding: 0 };
+const listItemStyle = { marginBottom: '15px', fontSize: '1.15rem', lineHeight: '1.6' };
+const numberedListStyle = { paddingLeft: '25px' };
+const stepItemStyle = { marginBottom: '20px', fontSize: '1.15rem', lineHeight: '1.7' };
+const bookButtonStyle = {
+  width: '100%',
+  padding: '20px',
+  backgroundColor: '#99ff66',
+  color: '#052a1a',
+  border: 'none',
+  borderRadius: '20px',
+  fontWeight: '800',
+  fontSize: '1.2rem',
+  cursor: 'pointer',
+  marginTop: '45px',
+  transition: 'transform 0.2s ease',
+  boxShadow: '0 10px 20px rgba(153, 255, 102, 0.2)'
+};
+const ingredientsSection = { marginBottom: '40px' };
+const instructionsSection = { marginBottom: '40px' };
+
+export default Recipes;
