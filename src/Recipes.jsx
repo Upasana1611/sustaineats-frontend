@@ -29,21 +29,43 @@ const Recipes = () => {
         const data = await response.json();
         
         if (response.ok) {
+            const text = data.recipe_text;
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l !== '');
+            
+            let recipeName = "✨ AI Chef's Creation ✨";
+            let ingredients = [];
+            let steps = [];
+            
+            lines.forEach(line => {
+                // Remove all hashtags, bold markers, and strip leading numbers/dots
+                const cleanLine = line.replace(/[#*]/g, '').trim();
+                
+                if (line.startsWith('## ') && !line.toLowerCase().includes('instruction')) {
+                    recipeName = `✨ ${cleanLine} ✨`;
+                } else if (cleanLine.toLowerCase().startsWith('match:') || cleanLine.toLowerCase().startsWith('missing:')) {
+                    ingredients.push(cleanLine);
+                } else if (!line.startsWith('#') && !cleanLine.toLowerCase().includes('sustainability score')) {
+                    // Remove leading iteration numbers (e.g., "1. Sauté" becomes "Sauté")
+                    const finalStep = cleanLine.replace(/^\d+[\.)]\s*/, '').trim();
+                    if (finalStep) steps.push(finalStep);
+                }
+            });
+
             setSelectedRecipe({
                 id: 'ai-generated',
-                name: "✨ AI Chef's Creation ✨",
+                name: recipeName,
                 time: "Flexible",
                 servings: "Custom",
                 calories: "Varies",
-                ingredients: ["Check the recipe text below for full details!"],
-                steps: data.recipe_text.split('\n').filter(line => line.trim() !== '')
+                ingredients: ingredients.length > 0 ? ingredients : ["Your personalized sustainability feast!"],
+                steps: steps.length > 0 ? steps : ["Enjoy your custom recipe!"]
             });
         } else {
             alert(data.error || "Failed to generate recipe.");
         }
     } catch (error) {
         console.error("AI Recipe Error:", error);
-        alert(`An error occurred while talking to the AI Chef: ${error.message}. Please check if the backend URL is correct and the server is running.`);
+        alert(`An error occurred while talking to the AI Chef: ${error.message}`);
     } finally {
         setIsGenerating(false);
     }
