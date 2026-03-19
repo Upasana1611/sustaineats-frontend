@@ -23,7 +23,7 @@ const Profile = () => {
   const [journeyData, setJourneyData] = useState({
     itemsSaved: 0,
     co2Emitted: "0 kg",
-    moneyLost: "$0.00",
+    moneyLost: "₹0.00",
     ecoScore: 0,
     badges: [],
     memberSince: "Feb 2026"
@@ -123,6 +123,7 @@ const Profile = () => {
 
       if (response.ok) {
         alert("Success! Health profile updated.");
+        await fetchProfileData(); // Refresh current data view
         setActiveTab('dashboard');
       }
 

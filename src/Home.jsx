@@ -14,14 +14,29 @@ const Home = () => {
   const userEmail = localStorage.getItem("email") || localStorage.getItem("userEmail");
   const token = localStorage.getItem("token");
 
+  const [stats, setStats] = useState({ ecoScore: 0, itemsSaved: 0, moneyLost: "₹0.00" });
+  
   useEffect(() => {
     if (userEmail && token) {
+      // Fetch suggested recipes
       fetch(`${API_BASE_URL}/suggest-recipes/${userEmail}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then((res) => res.json())
         .then((data) => setRecipes(data.slice(0, 3)))
         .catch((err) => console.error("Error fetching recipes:", err));
+
+      // Fetch user stats
+      fetch(`${API_BASE_URL}/user-stats/${userEmail}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => setStats({
+           ecoScore: data.ecoScore || 0,
+           itemsSaved: data.itemsSaved || 0,
+           moneyLost: data.moneyLost || "₹0.00"
+        }))
+        .catch(err => console.error("Error fetching stats:", err));
     }
   }, [userEmail]);
   const handleLogout = () => {
@@ -86,6 +101,22 @@ const Home = () => {
           <p style={heroSubHeader}>We are obsessed with</p>
           <h1 style={heroMainHeader}>Healthy<br />Eating<br />Made Easy</h1>
           <p style={heroDescription}>Explore our healthy meal delivery options and reduce your carbon footprint with every bite.</p>
+
+          {/* New Stats Quick Dashboard */}
+          <div style={statsRow}>
+            <div style={statItem}>
+              <span style={statVal}>{stats.ecoScore}</span>
+              <span style={statLab}>Eco-Score 🌱</span>
+            </div>
+            <div style={statItem}>
+              <span style={statVal}>{stats.itemsSaved}</span>
+              <span style={statLab}>Items Saved 🍽️</span>
+            </div>
+            <div style={statItem}>
+              <span style={{...statVal, color: '#ff4d4d'}}>{stats.moneyLost}</span>
+              <span style={statLab}>Waste Loss 🗑️</span>
+            </div>
+          </div>
 
           <div style={heroActionRow}>
             <button onClick={() => navigate('/inventory')} style={exploreBtn}>
@@ -207,6 +238,11 @@ const heroMainHeader = { fontSize: '100px', fontWeight: '900', lineHeight: '0.9'
 const heroDescription = { fontSize: '22px', color: '#ccc', marginBottom: '50px', maxWidth: '600px' };
 const heroActionRow = { display: 'flex', alignItems: 'center', gap: '40px' };
 const exploreBtn = { backgroundColor: '#ffcc33', color: '#000', border: 'none', padding: '22px 45px', borderRadius: '60px', fontWeight: 'bold', fontSize: '22px', cursor: 'pointer', boxShadow: '0 10px 30px rgba(255,204,51,0.3)' };
+
+const statsRow = { display: 'flex', gap: '30px', marginBottom: '40px', background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.05)', maxWidth: 'fit-content' };
+const statItem = { display: 'flex', flexDirection: 'column', gap: '5px' };
+const statVal = { fontSize: '26px', fontWeight: 'bold', color: '#99ff66' };
+const statLab = { fontSize: '13px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px' };
 
 const featuredMealBox = { display: 'flex', alignItems: 'flex-start', gap: '15px', maxWidth: '350px' };
 const bulletStyle = { color: '#ffcc33', fontSize: '35px', lineHeight: '1' };

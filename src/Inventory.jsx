@@ -74,7 +74,7 @@ const Inventory = () => {
     } catch (err) { console.error("Add error:", err); }
   };
 
-  const handleDelete = async (itemName) => {
+  const handleDelete = async (itemName, reason = 'consumed') => {
     try {
         const res = await fetch(`${API_BASE_URL}/inventory/delete`, {
             method: 'POST',
@@ -82,7 +82,7 @@ const Inventory = () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ name: itemName, email: userEmail })
+            body: JSON.stringify({ name: itemName, email: userEmail, reason: reason })
         });
         if (res.ok) fetchInventory();
     } catch (err) { console.error("Delete error:", err); }
@@ -158,9 +158,10 @@ const Inventory = () => {
                       <strong style={{ fontSize: '1.1rem', color: '#333' }}>{item.name}</strong>
                       <div style={{ fontSize: '0.85rem', color: '#666' }}>Qty: {item.quantity} | <b style={{color: statusColor}}>{statusText}</b></div>
                     </div>
-                    <div>
-                        {/* Gamification feature placeholder: We can consume or waste */}
-                        <button onClick={() => handleDelete(item.name)} style={deleteBtn} title="Consume / Delete">✔️</button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {/* Gamification feature: Mark as consumed or waste */}
+                        <button onClick={() => handleDelete(item.name, 'consumed')} style={consumeBtn} title="Mark as Consumed">🍽️</button>
+                        <button onClick={() => handleDelete(item.name, 'waste')} style={wasteBtn} title="Mark as Waste">🗑️</button>
                     </div>
                   </div>
                 );
@@ -209,7 +210,8 @@ const addBtnStyle = { padding: '15px', borderRadius: '50px', border: 'none', bac
 
 const stockListContainer = { maxHeight: '500px', overflowY: 'auto', paddingRight: '10px' };
 const stockCard = { backgroundColor: 'white', color: '#333', padding: '15px', borderRadius: '20px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.2)' };
-const deleteBtn = { background: 'none', border: 'none', color: '#ccc', fontSize: '1.2rem', cursor: 'pointer' };
+const consumeBtn = { background: '#e8f5e9', border: 'none', color: '#2e7d32', fontSize: '1.2rem', cursor: 'pointer', padding: '8px', borderRadius: '10px', transition: 'all 0.2s' };
+const wasteBtn = { background: '#ffebee', border: 'none', color: '#c62828', fontSize: '1.2rem', cursor: 'pointer', padding: '8px', borderRadius: '10px', transition: 'all 0.2s' };
 
 const suggestionSection = { marginTop: '50px', textAlign: 'center' };
 const suggestBtn = { padding: '15px 40px', borderRadius: '50px', border: 'none', backgroundColor: '#ffcc33', color: '#000', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer' };
