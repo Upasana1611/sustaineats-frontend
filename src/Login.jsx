@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API_BASE_URL from './config';
+import sustainableBg from './assets/sustainable-bg.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -84,9 +85,10 @@ const Login = () => {
         position: 'relative',
         minHeight: '100vh',
         width: '100vw',
-        background: 'linear-gradient(-45deg, #09130d, #0f2416, #091a10, #132a18)',
-        backgroundSize: '400% 400%',
-        animation: 'bgShimmer 15s ease infinite',
+        background: `linear-gradient(rgba(9, 19, 13, 0.85), rgba(15, 36, 22, 0.85)), url(${sustainableBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
